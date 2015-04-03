@@ -1,130 +1,133 @@
-/* Header
-================
-Name: main.cpp
-Authors: Amélie Frappier & Marc-Antoine Larose
-Creation Date: 26/03/2015
-Description:  */
+/* En-tête du programme
+=========================
+Programme: Bubble Shooter
+Fichier: main.cpp
+Auteur : Amélie Frappier et Marc-Antoine Larose
+Date création : 23/03/2015
+Date modification: 
+Description :  */
 
-/* TODOs
-=========== */
-//Header: add description
-//Draw start screen (integrate text? Sprite sheet for text?)
-//Time to do some PIXEL AAAAAAAART~
-//Animate start text???
-//Implement structures into game (Bubble class, GameArea class, Cannon class)
+/* TODO: améliorations à apporter au programme
+================================================= */
+//Créer des classes pour le canon, les bulles et l'aire de jeu
+//Mettre en place le jeu en lui-même
+//Intégrer classement + scoring + inclure librairie SDL_ttf
 
-
-/* Pre-Processing Information
-============================== */
+/* Directives au pré-processeur
+================================= */
 #include <iostream>
 #include "../SDL/SDL.h"
 
 using namespace std;
 
-/* Constants
-=============*/
-const int SCREEN_HEIGHT = 650;
-const int SCREEN_WIDTH = 400;
+/* Constantes du programme
+=========================== */
+const int SCREEN_HEIGHT = 450;
+const int SCREEN_WIDTH = 600;
 
-/* Method Prototypes
-===================== */
+/* Prototype des fonctions
+=========================== */
 void initVideo();
-SDL_Surface* setupScreen(char* title, char* img, int height, int width);
+SDL_Surface* setupScreen(char* title, char* img);
 SDL_Surface* loadBitmap(char* imgName);
-void setTransparency(SDL_Surface *picture, int red, int blue, int green);
+void setPosition(SDL_Surface *picture, SDL_Rect &position, int posX, int posY);
+void setTransparency(SDL_Surface *picture, int red, int green, int blue);
+void updateScreenNoCharset(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position);
 void updateScreen(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &currentSprite, SDL_Rect &position);
 void initCharset(SDL_Rect charset[4][3]);
+void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &screenIsActive);
 void centerSprite(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position);
-void checkKeyPresses(SDL_Event e, SDL_Rect &position, int moveIncrement, int &dir, int &frame, bool &active);
-int cycleWalkAnimation();
+void freeSurface(SDL_Surface *surface);
 
 
-/* Main Method
-================ */
+/* Méthode principale
+======================= */
 int main(int argc, char *argv[])
 {
 
-	SDL_Surface *screen = NULL;		//game screen
-	//SDL_Surface *player = NULL;		//image du personnage
-	SDL_Event e;					//event caught by SDL_WaitEvent
-	//SDL_Rect playerPosition;		//position du personnage dans l'espace
-	//SDL_Rect posCharset[4][3];		//tableau des images captées sur le charset
+	SDL_Surface *screen = NULL;			//fenêtre du jeu
+	SDL_Surface *background = NULL;		//image de fond du jeu
+	SDL_Surface *menu_rect = NULL;		//rectangle du menu
+	SDL_Surface *game_logo = NULL;		//logo (nom) du jeu)
 
-	//int direction = 0;				//direction où marche le personnage
-	//int frame = 0;					//frame d'animation du personnage
-	bool isActive = true;			//flag: game screen is currently active
+	SDL_Event e;						//événement capté par SDL_WaitEvent
+
+	SDL_Rect bgPosition;				//position du fond d'écran dans l'espace
+	SDL_Rect menuPosition;				//position du menu dans l'espace
+	SDL_Rect logoPosition;				//position du logo dans l'espace
+
+	bool isActive = true;				//flag déterminant si la fenêtre est active
 
 
-	//Initialize SDL screen
+	//Initialisation de la SDL
 	initVideo();
 
-	//Screen parameters
-	screen = setupScreen("Bubble Shooter", "sdl_icone.bmp", SCREEN_HEIGHT, SCREEN_WIDTH);
+	//Paramètres de l'écran
+	screen = setupScreen("Bubble Shooter", "sdl_icone.bmp");
+	
+	//Paramètres du fond d'écran
+	background = loadBitmap("menu_bg.bmp");
+	setPosition(background, bgPosition, 0, 0);
+	
+	//Paramètres du rectangle du menu
+	menu_rect = loadBitmap("rectangle_menu.bmp");
+	setPosition(menu_rect, menuPosition, 39, 256);
 
-	//Paramètres du joueur
-	//player = loadBitmap("charset.bmp");					//charge l'image
-	//initCharset(posCharset);							//initialisation du tableau des positions du charset
-	//centerSprite(screen, player, playerPosition);		//met le sprite au centre de l'écran
-	//setTransparency(player, 255, 255, 255);				//paramètre la transparence de l'image
+	//Paramètres du logo
+	game_logo = loadBitmap("game_logo2.bmp");
+	setPosition(game_logo, logoPosition, 50, 56);
+	//setTransparency(game_logo, 255, 0, 255);
 
-	//Rendering: Update screen for the first time
-	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 153, 204));
-	SDL_Flip(screen);
-	/*updateScreen(screen, player, posCharset[0][0], playerPosition);*/
+	//Mettre à jour l'écran une première fois
+	updateScreenNoCharset(screen, background, bgPosition);
+	updateScreenNoCharset(screen, game_logo, logoPosition);
+	updateScreenNoCharset(screen, menu_rect, menuPosition);
 
-	//Permet les répétitions de touche (20 ms)
-	/*SDL_EnableKeyRepeat(40, 40);*/
-
-	while (isActive)	//while game screen is currently active
+	while (isActive)	//tant que l'application est active
 	{
 		SDL_WaitEvent(&e);
 		switch (e.type)
 		{
 
-		case SDL_QUIT:		//on Windows Close button, close the game
+		case SDL_QUIT:		//si le joueur clique sur le X de la fenêtre, on ferme l'application
 			isActive = 0;
 			break;
 
-		case SDL_KEYDOWN:	//on keyPress...
-			
+		case SDL_KEYDOWN:	//si l'on appuie sur une touche quelconque
+
 			switch (e.key.keysym.sym)
 			{
 
-				//on Q, quit game
-			case SDLK_q:
-				//show confirmation screen???
+			case SDLK_q:	//si on appuie sur Q, fermer le programme
 				isActive = 0;
 				break;
 
-				//on R, show rules of the game
-			case SDLK_r:
-				//showRules();
+
+			case SDLK_r:	//si on appuie sur R, montrer les règles du jeu
+				showRules(screen, menu_rect, menuPosition, isActive);
 				break;
 
-				//on SPACE, start the game!
-			case SDLK_SPACE:
-				//gameStart();
+
+			case SDLK_SPACE:	//Si cela fonctionne, appeler la fonction play();
+				//play();
 				break;
 
 			}
 
-			break;
-
 		}
 
-		//Rendering: update screen based on current event
-		SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 153, 204));
-		SDL_Flip(screen);
-		
-		/*updateScreen(screen, player, posCharset[direction][frame], playerPosition);*/
+		////Rendering: Mettre à jour la fenêtre de jeu
+		//updateScreen(screen, player, posCharset[direction][frame], playerPosition);
 
 	}
 
-	//Free surfaces from memory
-	/*SDL_FreeSurface(player);*/
+	//Libère les surfaces de la mémoire	
+	freeSurface(menu_rect);
+	freeSurface(game_logo);
+	SDL_FreeSurface(background);
 	SDL_FreeSurface(screen);
 
-	//Quit the game
+	//Arrêt de la SDL (vider la mémoire)
 	SDL_Quit();
 	return 0;
 
@@ -134,9 +137,9 @@ int main(int argc, char *argv[])
 ====================== */
 void initVideo()
 {
-	SDL_Init(SDL_INIT_VIDEO);	//Démarrage de la SDL (charger le système vidéo)
+	SDL_Init(SDL_INIT_EVERYTHING);	//Démarrage de la SDL (charger le système vidéo)
 
-	if (SDL_Init(SDL_INIT_VIDEO) == -1)  //Si le démarrage de la librairie SDL échoue
+	if (SDL_Init(SDL_INIT_EVERYTHING) == -1)  //Si le démarrage de la librairie SDL échoue
 	{
 		//Gestion des erreurs de la librairie SDL
 		cout << "Erreur lors de l'initialisation de la SDL", SDL_GetError();
@@ -146,12 +149,12 @@ void initVideo()
 
 /* Initialise les paramètres de l'écran
 ========================================== */
-SDL_Surface* setupScreen(char* title, char* img, int height, int width)
+SDL_Surface* setupScreen(char* title, char* img)
 {
 	SDL_Surface* screen;	//Écran à paramètrer
 
 	//Chargement de la vidéo
-	screen = SDL_SetVideoMode(640, 480, 32, SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF);
+	screen = SDL_SetVideoMode(SCREEN_HEIGHT, SCREEN_WIDTH, 32, SDL_HWSURFACE | SDL_RESIZABLE | SDL_DOUBLEBUF);
 	if (screen == NULL)
 	{
 		cout << "Erreur lors de l'initialisation de la SDL" << SDL_GetError();
@@ -169,25 +172,47 @@ SDL_Surface* setupScreen(char* title, char* img, int height, int width)
 ========================================== */
 SDL_Surface* loadBitmap(char* imgName)
 {
-	SDL_Surface* bmp;		//image au format bitmap
+	SDL_Surface* loadedImage = NULL;		//Temporary storage for the image that's loaded
+	SDL_Surface* optimizedImage = NULL;		//The optimized image that will be used
 
-	bmp = SDL_LoadBMP(imgName);
+	loadedImage = SDL_LoadBMP(imgName);		//Load the image
 
-	return bmp;
+	//If nothing went wrong in loading the image
+	if (loadedImage != NULL)
+	{
+		//Create an optimized image
+		optimizedImage = SDL_DisplayFormat(loadedImage);
+
+		//Free the old image
+		SDL_FreeSurface(loadedImage);
+	}
+
+	return optimizedImage;
 }
 
 /* Met la couleur de fond d'une image en transparence
 ======================================================= */
-void setTransparency(SDL_Surface *picture, int red, int blue, int green)
+void setTransparency(SDL_Surface *picture, int red, int green, int blue)
 {
-	SDL_SetColorKey(picture, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(picture->format, red, blue, green));
+	//If nothing went wrong in loading the image
+	if (picture != NULL)
+	{
+		SDL_SetColorKey(picture, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(picture->format, red, green, blue));
+	}
 }
 
-/* Met à jour l'écran du jeu
-============================= */
+/* Met à jour l'écran du jeu - Ne prend pas en compte les charset
+================================================================== */
+void updateScreenNoCharset(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position) 
+{
+	SDL_BlitSurface(picture, NULL, screen, &position);
+	SDL_Flip(screen);
+}
+
+/* Met à jour l'écran du jeu - Prend en compte les charset
+=========================================================== */
 void updateScreen(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &currentSprite, SDL_Rect &position)
 {
-	SDL_FillRect(screen, NULL, SDL_MapRGB(screen->format, 0, 153, 204));
 	SDL_BlitSurface(picture, &currentSprite, screen, &position);
 	SDL_Flip(screen);
 }
@@ -212,6 +237,15 @@ void initCharset(SDL_Rect charset[4][3])
 
 }
 
+
+/* Paramètre la position d'une image dans l'espace
+==================================================== */
+void setPosition(SDL_Surface *picture, SDL_Rect &position, int posX, int posY)
+{
+	position.x = posX;
+	position.y = posY;
+}
+
 /* Met une image passée en paramètre au centre de l'écran
 ========================================================== */
 void centerSprite(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position)
@@ -220,78 +254,60 @@ void centerSprite(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position)
 	position.y = screen->h / 2 - picture->h / 2;
 }
 
-/* Vérifie quelle touche a été tapée sur le clavier et agit en conséquence
-=========================================================================== */
-void checkKeyPresses(SDL_Event e, SDL_Rect &position, int moveIncrement, int &dir, int &frame, bool &active)
+/* Montre les règles du jeu
+============================= */
+void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &screenIsActive)
 {
+	SDL_Surface *rules = NULL;			//règlements du jeu
+	SDL_Event e;						//événement capté par SDL_WaitEvent
+	SDL_Rect rulesPos;					//position des règles dans l'espace
 
-	switch (e.key.keysym.sym)
+	bool rulesIsActive = true;			//fenêtre des règles du jeu est active
+
+	//Paramètres du rectangle du menu
+	rules = loadBitmap("rectangle_rules.bmp");
+	setPosition(rules, rulesPos, 39, 256);
+
+	//Mettre à jour l'écran une première fois
+	updateScreenNoCharset(screen, rules, rulesPos);
+
+	while (rulesIsActive)	//tant que les règlements sont actifs
 	{
+		SDL_WaitEvent(&e);
+		switch (e.type)
+		{
+		case SDL_QUIT:		//si le joueur clique sur le X de la fenêtre, on ferme l'application EN ENTIER
+			rulesIsActive = 0;
+			screenIsActive = 0;
+			break;
 
-		//si on appuie sur Échap, fermer le programme
-	case SDLK_ESCAPE:
-		active = 0;
-		break;
+		case SDL_KEYDOWN:	//si l'on appuie sur une touche quelconque
 
-		//le personnage se déplace vers le haut
-	case SDLK_UP:
-		position.y -= moveIncrement;
-		dir = 3;
-		frame = cycleWalkAnimation();
-		break;
+			switch (e.key.keysym.sym)
+			{
 
-		//le personnage se déplace vers le bas
-	case SDLK_DOWN:
-		position.y += moveIncrement;
-		dir = 0;
-		frame = cycleWalkAnimation();
-		break;
+			case SDLK_q:	//si on appuie sur Q, fermer les règles et montrer le menu à nouveau
 
-		//le personnage de déplace vers la gauche
-	case SDLK_LEFT:
-		position.x -= moveIncrement;
-		dir = 1;
-		frame = cycleWalkAnimation();
-		break;
+				updateScreenNoCharset(screen, menu, menuPos);	//Redessiner le menu sur l'écran	
+				rulesIsActive = 0;
+				break;
+			}
 
-		//le personnage de déplace vers la droite
-	case SDLK_RIGHT:
-		position.x += moveIncrement;
-		dir = 2;
-		frame = cycleWalkAnimation();
-		break;
+		}
 
 	}
+
+	SDL_FreeSurface(rules);		//Libérer les règles de la mémoire
 
 }
 
-/* Cycle d'animation de marche du joueur
-========================================= */
-int cycleWalkAnimation()
+/* Libère la surface d'une image si elle n'est pas NULL
+========================================================== */
+void freeSurface(SDL_Surface *surface) 
 {
-	static int frameNumber = 0;		//numéro de la frame où on est rendu
-	static int rewind = 0;			//détermine si l'animation revient en arrière (1)
-	//ou avance ar en avant (0)
-
-	if (frameNumber == 0)			//dès que le personnage atteint la première frame
+	if (surface != NULL)
 	{
-		rewind = 0;		//le personnage va par en avant
+		SDL_FreeSurface(surface);
+		surface = NULL;
 	}
-	else if (frameNumber == 2)		//autrement, passer à la prochaine frame
-	{
-		rewind = 1;		//le personnage va par en arrière
-	}
-
-	if (rewind == 0)			//si le personnage va vers l'avant, incrémenter positivement
-		//le numéro de frame
-	{
-		frameNumber++;
-	}
-	else if (rewind == 1)	//si le personnage va vers l'avant, incrémenter positivement
-		//le numéro de frame
-	{
-		frameNumber--;
-	}
-
-	return frameNumber;
 }

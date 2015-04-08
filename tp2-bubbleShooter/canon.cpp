@@ -16,7 +16,7 @@ Canon::~Canon()
 
 void Canon::update(SDL_Surface *screen) 
 {
-	setPosition(displayedSprite, position, (SCREEN_WIDTH - displayedSprite->w) / 2, (SCREEN_HEIGHT - displayedSprite->h * 3 / 4));
+	setPosition(displayedSprite, position, (SCREEN_WIDTH - displayedSprite->w) / 2, (SCREEN_HEIGHT - displayedSprite->h / 2));
 	setTransparency(displayedSprite, 0, 0, 0);
 	updateScreen(screen, displayedSprite, position);
 }

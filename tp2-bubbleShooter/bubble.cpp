@@ -8,6 +8,7 @@ Bubble::Bubble(int colorValue)
 	spriteSheet = loadBitmap("bubble.bmp");
 	color = colorValue;
 	initCharset(sprite, NB_COLORS);
+	inGameStatus = true;
 
 }
 
@@ -25,6 +26,20 @@ Bubble::~Bubble()
 int Bubble::getColor() 
 {
 	return color;
+}
+
+/* Retourne la veleur indiquant si une bulle donnée a explosé (et est donc inaccessible)
+========================================================================================= */
+bool Bubble::getInGameStatus()
+{
+	return inGameStatus;
+}
+
+/* Met en place la hitbox de la bulle
+================================================= */
+void setHitbox(SDL_Rect &position, int radius) 
+{
+	//see how to set hitbox
 }
 
 /* Affiche la bulle à une position donnée dans l'écran

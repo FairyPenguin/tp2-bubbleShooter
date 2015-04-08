@@ -5,12 +5,12 @@
 
 namespace BubbleShooterUtil 
 {
-	
 	/* Constantes du programme
 	=========================== */
 	extern const int SCREEN_HEIGHT;
 	extern const int SCREEN_WIDTH;
 	extern const int NB_COLORS;				//nombre de couleurs maximales
+	extern const int BUBBLE_RADIUS;			//rayon du cercle en pixels
 
 	/* Prototypes des fonctions
 	============================= */

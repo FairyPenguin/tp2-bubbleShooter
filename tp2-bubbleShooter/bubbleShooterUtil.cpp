@@ -7,6 +7,7 @@ namespace BubbleShooterUtil
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_WIDTH = 450;
 	const int NB_COLORS = 3;
+	const int BUBBLE_RADIUS = 10;
 
 	/* Initialise la SDL
 	====================== */

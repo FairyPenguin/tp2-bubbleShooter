@@ -30,24 +30,27 @@ Description :  */
 
 using namespace BubbleShooterUtil;
 
+/* Constantes du projet 
+======================== */
+const int STARTING_BUBBLES = 7;
+
 /* Structures du projet
 =========================== */
 
-//Désigne les "slots" invisibles ou seront placées les bulles dnas l'aire de jeu
-struct GameArea
-{
-	int positionX;		//position en X dans l'aire de jeu
-	int positionY;		//position en Y dans l'aire de jeu
-	//set bubbleID??
-};
+////Désigne les "slots" invisibles ou seront placées les bulles dans l'aire de jeu
+//struct GameArea
+//{
+//	int positionX;		//position en X dans l'aire de jeu
+//	int positionY;		//position en Y dans l'aire de jeu
+//	//set bubbleID??
+//};
 
 /* Prototype des fonctions
 =========================== */
-void initCharset(SDL_Rect charset[4][3]);
 void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &screenIsActive);
 void centerSprite(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position);
 void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &screenIsActive);
-void initGameArea(GameArea area[10][13], int nbBubbles);
+void initGame(SDL_Surface *screen, Bubble *bubbleArray[300], int &bubbleCounter, int startingNb);
 void freeSurface(SDL_Surface *surface);
 
 
@@ -169,6 +172,9 @@ void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &
 
 	while (rulesIsActive)	//tant que les règlements sont actifs
 	{
+
+		SDL_Flip(screen);
+
 		SDL_WaitEvent(&e);
 		switch (e.type)
 		{
@@ -201,20 +207,27 @@ void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &
 ===================================== */
 void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &screenIsActive)
 {
-	Canon* canon = new Canon();			//le canon tirant les bulles 
 
-	GameArea bubbleArray[10][8] = {0, 0};		//le tableau stockant les bulles en jeu ainsi que leur position
-	
-	Bubble* activeBubble = new Bubble(0);		//la bulle active
-	Bubble* nextBubble = new Bubble(1);			//la prochaine bulle en jeu
+	SDL_Event e;										//événement capté par SDL_WaitEvent
 
-	SDL_Event e;						//événement capté par SDL_WaitEvent
+	int bubbleCounter;									//compte le nombre de bulles en jeu et permet d'identifier les bulles par un identifiant numérique
+	bool gameIsActive;									//le jeu est actif
 
-	int bubbleCounter = 0;				//compte le nombre de bulles en jeu et permet d'identifier les bulles (set bubbleID??)
-	bool gameIsActive = true;			//le jeu est actif
+	Bubble* bubbleArray[300];							//tableau contenant les bulles en jeu
+
+	Canon* canon = new Canon();							//le canon tirant les bulles 
+	Bubble* activeBubble = new Bubble(0);				//la bulle active
+	Bubble* nextBubble = new Bubble(1);					//la prochaine bulle en jeu
+
+	//Initialisation des variables
+	bubbleCounter = 0;
+	gameIsActive = true;
 
 	//Redessiner l'écran avec le background pour faire disparaître le menu
 	updateScreen(screen, bg, bgPos);
+
+	//Générer l'aire de jeu et dessiner les bulles qui sont en jeu
+	initGame(screen, bubbleArray, bubbleCounter, 7);
 
 	//Dessiner une première fois le canon, la bulle active et la prochaine bulle en jeu
 	canon->update(screen);
@@ -250,15 +263,23 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 				break;
 
 			case SDLK_SPACE:	//lance la bulle lorsque l'on appuie sur Espace
-				/*activeBubble->shoot();*/
+				/*activeBubble->move();*/
+				/*activeBubble->checkSurroundingBubbles()*/
 				break;
 			}
 
 		}
 
+		//Mettre à jour l'écran après chaque itération de la boucle
 		updateScreen(screen, bg, bgPos);
 		
-		//Mettre à jour l'écran après chaque itération de la boucle
+		//Mettre à jour les bulles présentement en jeu
+		for (int i = 0; i < bubbleCounter; i++)
+		{
+			bubbleArray[i]->update(screen, 47 * i + 24, 0);
+		}
+
+		//Mettre à jour le canon, la bulle active et la prochaine bulle 
 		canon->update(screen);
 		activeBubble->update(screen, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);
 		nextBubble->update(screen, SCREEN_WIDTH / 2 + 47, SCREEN_HEIGHT - 20);
@@ -272,29 +293,21 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 
 }
 
-/* Initialiser l'aire de jeu 
-================================ */
-void initGameArea(GameArea area[10][8], int nbBubbles) 
+/* Initialise les bulles qui sont en jeu
+========================================== */
+void initGame(SDL_Surface *screen, Bubble *bubbleArray[300], int &bubbleCounter, int startingNb)
 {
-	
-		for (int i = 0; i < 10; i++)		//pour chaque rangée de l'aire de jeu
-		{
-			for (int j = 0; j < 8; j++)
-			{
+	int startingPattern[STARTING_BUBBLES] = {0, 1, 2, 2, 0, 1, 0};				//indique les couleurs situées dans le pattern de départ
 
-				area[i][j].positionX = 47 * i;
-				area[i][j].positionX = 47 * j;
-			
-				if (nbBubbles > 0)			//tant que l'on peut mettre des bulles en jeu
-				{
-					//insérer bulle dans l'endroit correspondant
-					//nbBubbles--;
-				}
+	for (int i = 0; i < startingNb; i++)										//pour le nombre de bulles à mettre en jeu, en insérer une dans l'aire de jeu
+	{
+		bubbleArray[i] = new Bubble(startingPattern[i]);
+		bubbleArray[i]->update(screen, 47 * i + 24, 0);
+	}
 
-			}	
+	bubbleCounter = startingNb;													//indique au compteur de bulles qu'il y a maintenant (X) bulles en jeu
 
-		}
-	
+
 }
 
 /* Libère la surface d'une image si elle n'est pas NULL

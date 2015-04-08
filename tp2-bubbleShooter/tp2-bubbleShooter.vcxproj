@@ -79,11 +79,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="bubble.cpp" />
     <ClCompile Include="bubbleShooterUtil.cpp" />
     <ClCompile Include="canon.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bubble.h" />
     <ClInclude Include="bubbleShooterUtil.h" />
     <ClInclude Include="canon.h" />
   </ItemGroup>

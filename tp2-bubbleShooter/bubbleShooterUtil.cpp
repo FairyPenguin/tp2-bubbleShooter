@@ -6,6 +6,7 @@ namespace BubbleShooterUtil
 {
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_WIDTH = 450;
+	const int NB_COLORS = 3;
 
 	/* Initialise la SDL
 	====================== */
@@ -83,11 +84,50 @@ namespace BubbleShooterUtil
 		}
 	}
 
-	/* Met à jour l'écran du jeu - Prend en compte les charset
-	=========================================================== */
+	/* Met à jour l'écran du jeu
+	Cette fonction ne prend pas en compte les charset
+	===================================================== */
 	void updateScreen(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position)
 	{
 		SDL_BlitSurface(picture, NULL, screen, &position);
-		/*SDL_Flip(screen);*/
 	}
+
+	/* Met à jour l'écran du jeu
+	Cette fonction prend pas en compte les charset
+	===================================================== */
+	void updateScreenWithSpriteSheet(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &currentSprite, SDL_Rect &position) 
+	{
+		SDL_BlitSurface(picture, &currentSprite, screen, &position);
+	}
+
+	/* Initialise le tableau des sprites d'un charset donné
+	========================================================= */
+	void initCharset(SDL_Rect charset[], int taille)
+	{
+
+		for (int x = 0; x < taille; x++)		//pour chaque ligne de l'image
+		{
+
+				charset[x].x = x * 47;		//position du posCharset sur l'axe des X
+				charset[x].y = 0;			//position de posCharset sur l'axe des Y
+				charset[x].w = 47;			//largeur en pixels du rectangle
+				charset[x].h = 47;			//hauteur en pixels du rectangle
+			}
+
+	}
+
+	/* Assigne et retourne une valeur aléatoire
+	============================================ */
+	int setRandomValue(int maxValue)
+	{
+		int nb;
+
+		//do randomizer
+
+		return nb;
+	}
+
+
+
 }
+

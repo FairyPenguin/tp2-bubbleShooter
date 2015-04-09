@@ -4,24 +4,27 @@ Programme: Bubble Shooter
 Fichier: main.cpp
 Auteur : Amélie Frappier et Marc-Antoine Larose
 Date création : 23/03/2015
-Date modification: 07/04/2015
+Date modification: 08/04/2015
 Description :  */
 
 /* TODO: améliorations à apporter au programme
 ================================================= */
 
 /* ------ Amélie ---------- */
-//Mettre en place les bulles dans l'aire de jeu->insérer bulles dans la structure GameArea
-//Moteur de collision des bulles (à faire mercredi!!!)
-//Check Bulles Adjacentes quand le moteur des collisions sera terminé
+//Conflit WaitEvent/PollEvent à règler. Conflit entre actions du canon et actions de la bulle. Je ne peux ni mettre la canon en PollEvent ou la bulle en WaitEvent... =/
+//Calculer la vélocité correctement. On peut toutefois tester le reste avec des valeurs hardcodées en attendant
+//Règler changement vélocité en X quand on touche les coins. Il stick sur le bord.
+//Collision des bulles à déboguer. Ça overlap un tit-tit peu... 
+//Check Bulles Adjacentes quand le moteur des collisions sera terminé. Ressortir le Démineur des boules à mites. LOL. 
 
 /* ------ Marc-Antoine ---------- */
-//Intégrer scoring + librairie SDL_ttf
+//Intégrer scoring
 //Intégrer SDL_ttf de façon portative
 
 
 /* Directives au pré-processeur
 ================================= */
+#include <math.h>
 #include "../SDL/SDL.h"
 #include "../SDL/SDL_rotozoom.h"
 #include "bubbleShooterUtil.h"
@@ -33,17 +36,7 @@ using namespace BubbleShooterUtil;
 /* Constantes du projet 
 ======================== */
 const int STARTING_BUBBLES = 7;
-
-/* Structures du projet
-=========================== */
-
-////Désigne les "slots" invisibles ou seront placées les bulles dans l'aire de jeu
-//struct GameArea
-//{
-//	int positionX;		//position en X dans l'aire de jeu
-//	int positionY;		//position en Y dans l'aire de jeu
-//	//set bubbleID??
-//};
+const int REFRESH_TIME = 600;
 
 /* Prototype des fonctions
 =========================== */
@@ -51,6 +44,7 @@ void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &
 void centerSprite(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &position);
 void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &screenIsActive);
 void initGame(SDL_Surface *screen, Bubble *bubbleArray[300], int &bubbleCounter, int startingNb);
+bool checkCollisions(Bubble *thisBubble, Bubble *bubbleArray[300], int &bubbleCounter);
 void freeSurface(SDL_Surface *surface);
 
 
@@ -64,7 +58,7 @@ int main(int argc, char *argv[])
 	SDL_Surface *menu_rect = NULL;		//rectangle du menu
 	SDL_Surface *game_logo = NULL;		//logo (nom) du jeu)
 
-	SDL_Event e;						//événement capté par SDL_WaitEvent
+	SDL_Event e;						//événement capté par SDL_PollEvent
 
 	SDL_Rect bgPosition;				//position du fond d'écran dans l'espace
 	SDL_Rect menuPosition;				//position du menu dans l'espace
@@ -77,7 +71,7 @@ int main(int argc, char *argv[])
 	initVideo();
 
 	//Paramètres de l'écran
-	screen = setupScreen("Bubble Shooter", "sdl_icone.bmp");
+	screen = setupScreen("Bubble Shooter", "greenBubble.bmp");
 	
 	//Paramètres du fond d'écran
 	background = loadBitmap("menu_bg.bmp");
@@ -209,9 +203,14 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 {
 
 	SDL_Event e;										//événement capté par SDL_WaitEvent
+	SDL_Event moveE;									//événement capté par SDL_PollEvent
+	SDL_Rect activeBubblePos;							//position de la bulle active lorsqu'elle est en mouvement
 
-	int bubbleCounter;									//compte le nombre de bulles en jeu et permet d'identifier les bulles par un identifiant numérique
+	int currentTime;									//temps actuel
+	int previousTime;									//temps précédent
+	int bubbleCounter;									//compte le nombre de bulles en jeu
 	bool gameIsActive;									//le jeu est actif
+	bool bubbleIsMoving;								//la bulle bouge dans l'écran
 
 	Bubble* bubbleArray[300];							//tableau contenant les bulles en jeu
 
@@ -221,7 +220,10 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 
 	//Initialisation des variables
 	bubbleCounter = 0;
+	previousTime = 0;
+	currentTime = 0;
 	gameIsActive = true;
+	bubbleIsMoving = false;
 
 	//Redessiner l'écran avec le background pour faire disparaître le menu
 	updateScreen(screen, bg, bgPos);
@@ -240,35 +242,97 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 	{
 		SDL_Flip(screen);
 
-		SDL_WaitEvent(&e);
-		switch (e.type)
-		{
-		case SDL_QUIT:			//si le joueur clique sur le X de la fenêtre, on ferme l'application EN ENTIER
-			gameIsActive = 0;
-			screenIsActive = 0;
-			break;
+		//SDL_WaitEvent(&e);	//événements de type Wait
+		//	switch (e.type)
+		//	{
+		//	case SDL_QUIT:			//si le joueur clique sur le X de la fenêtre, on ferme l'application EN ENTIER
+		//		gameIsActive = 0;
+		//		screenIsActive = 0;
+		//		break;
 
-		case SDL_KEYDOWN:		//si l'on appuie sur une touche quelconque
+		//	case SDL_KEYDOWN:		//si l'on appuie sur une touche quelconque
 
-			switch (e.key.keysym.sym)
+		//		switch (e.key.keysym.sym)
+		//		{
+
+		//		case SDLK_LEFT:		//tourne le canon à gauche avec la flèche de gauche
+		//			canon->rotate(Canon::LEFT);
+		//			break;
+
+		//		case SDLK_RIGHT:   //tourne le canon à droite avec la flèche de droite
+		//			canon->rotate(Canon::RIGHT);
+		//			break;
+		//		}
+
+		//		break;
+		//	}
+
+
+		SDL_PollEvent(&moveE);		//événements de type Poll
+			switch (moveE.type)
 			{
+			case SDL_KEYDOWN:		//si l'on appuie sur une touche quelconque
 
-			case SDLK_LEFT:		//tourne le canon à gauche avec la flèche de gauche
-				canon->rotate(Canon::LEFT);
-				break;
+				switch (moveE.key.keysym.sym)
+				{
+				case SDLK_SPACE:	//lance la bulle lorsque l'on appuie sur Espace
 
+					bubbleIsMoving = true;
 
-			case SDLK_RIGHT:   //tourne le canon à droite avec la flèche de droite
-				canon->rotate(Canon::RIGHT);
-				break;
+					//activeBubble->setVelocity();		//calculer la vélocité de la bulle via l'angle du canon
 
-			case SDLK_SPACE:	//lance la bulle lorsque l'on appuie sur Espace
-				/*activeBubble->move();*/
-				/*activeBubble->checkSurroundingBubbles()*/
+					//TESTÉ ICI AVEC DES VALEURS ARBITRAIRES!!!
+					activeBubble->setVelocity(3, -3);	//calcule la vitesse de la bulle en X et en Y
+
+					if (bubbleIsMoving)		//si la bulle bouge et n'est pas arrêtée
+					{
+
+						currentTime = SDL_GetTicks();		//initialise le timer en prenant les valeur réelles
+
+						if (currentTime - previousTime > REFRESH_TIME)	
+						{
+							activeBubble->move();
+							currentTime = previousTime;
+						}
+						else
+						{
+							//on endort le programme pour ne pas qu'il prenne trop de CPU
+							SDL_Delay(REFRESH_TIME - (previousTime - currentTime));
+						}
+
+    					//Vérifier les collisions avec le reste des bulles en jeu
+						bubbleIsMoving = checkCollisions(activeBubble, bubbleArray, bubbleCounter);
+
+						//Si jamais la bulle atteint le haut de l'écran, elle est "stickée" là et ne bouge plus
+						SDL_Rect activeBubblePos;
+						activeBubblePos = activeBubble->getPosition();
+
+						if (activeBubblePos.y < 0)
+						{
+							bubbleIsMoving = false;
+						}
+						
+						//si la bulle ne bouge plus car elle est entrée en contact avec quelque chose, 
+						//changer la bulle active pour la prochaine bulle, et générer une nouvelle prochaine bulle
+						if (!bubbleIsMoving)
+						{
+							bubbleArray[bubbleCounter] = activeBubble;
+							bubbleCounter++;
+
+							activeBubble = nextBubble;
+							//int color = setRandomValue();
+							int color = 0;
+							nextBubble = new Bubble(color);
+						}
+
+					}
+
+					/*checkSurroundingBubbles(activeBubble, bubbleArray[])*/
+					break;
+				}
+
 				break;
 			}
-
-		}
 
 		//Mettre à jour l'écran après chaque itération de la boucle
 		updateScreen(screen, bg, bgPos);
@@ -276,17 +340,42 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 		//Mettre à jour les bulles présentement en jeu
 		for (int i = 0; i < bubbleCounter; i++)
 		{
-			bubbleArray[i]->update(screen, 47 * i + 24, 0);
+			SDL_Rect pos = bubbleArray[i]->getPosition();
+			bubbleArray[i]->update(screen, pos.x, pos.y);
 		}
 
 		//Mettre à jour le canon, la bulle active et la prochaine bulle 
 		canon->update(screen);
-		activeBubble->update(screen, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);
+
+		//Si la bulle active est en mouvement, la bulle active possède une nouvelle position.
+		if (bubbleIsMoving)		
+		{
+			activeBubblePos = activeBubble->getPosition();
+			activeBubble->update(screen, activeBubblePos.x, activeBubblePos.y);
+		}
+		//Autrement, elle possède les valeurs par défaut de activeBubble, elle est donc en bas de l'écran
+		else					
+		{
+			activeBubble->update(screen, SCREEN_WIDTH / 2, SCREEN_HEIGHT - 20);		
+		}
+		
+		//La prochaine bulle demeure à la même position en toutes circonstances
 		nextBubble->update(screen, SCREEN_WIDTH / 2 + 47, SCREEN_HEIGHT - 20);
 		
 	}
 
+
 	//Libérer les surfaces de la mémoire
+
+	for (int i = 0; i < bubbleCounter; i++)		//pour chaque bulle en jeu
+	{
+		bool status = bubbleArray[i]->getInGameStatus();	//si le garbage collector n'est pas passé auparavant, enlever les surfaces de la mémoire!
+		if (status)
+		{
+			delete bubbleArray[i];
+		}
+	}
+
 	delete canon;
 	delete activeBubble;
 	delete nextBubble;
@@ -307,7 +396,6 @@ void initGame(SDL_Surface *screen, Bubble *bubbleArray[300], int &bubbleCounter,
 
 	bubbleCounter = startingNb;													//indique au compteur de bulles qu'il y a maintenant (X) bulles en jeu
 
-
 }
 
 /* Libère la surface d'une image si elle n'est pas NULL
@@ -319,4 +407,56 @@ void freeSurface(SDL_Surface *surface)
 		SDL_FreeSurface(surface);
 		surface = NULL;
 	}
+}
+
+/* Vérifie la collision de bulles
+==================================== */
+bool checkCollisions(Bubble *thisBubble, Bubble *bubbleArray[300], int &bubbleCounter) 
+{
+	double distance;						//la distance entre deux bulles
+	bool noCollision;						//flag déterminant s'il y a eu collision
+
+	Bubble::Circle thisBubbleHitbox;		//hitbox de la bulle courante
+	Bubble::Circle theOtherHitbox;			//hitbox de l'autre bulle à comparer
+
+	noCollision = true;		//initialisation du flag
+
+	//Paramètres de la bulle courante
+	thisBubbleHitbox = thisBubble->getHitbox();
+
+	for (int i = 0; i < bubbleCounter; i++)		//pour chaque bulle présente dans l'aire de jeu
+	{
+		int gameStatus = bubbleArray[i]->getInGameStatus();
+
+		if (gameStatus)		//si la bulle à comparer est bien en jeu
+		{
+
+			//Vérifier tant que l'on a pas trouvé de collision: autrement on ne vérifie pas la condition
+			if (noCollision)
+			{
+
+				//Paramètres de la bulle à comparer
+				theOtherHitbox = bubbleArray[i]->getHitbox();
+
+				//Calcule la distance entre les centres du cercle
+				distance = sqrt( (double)pow(theOtherHitbox.centerX - thisBubbleHitbox.centerX, 2) +  (double)pow(theOtherHitbox.centerY - thisBubbleHitbox.centerY, 2));
+
+				//Il y a collision si la distance entre les centres du cercles est plus petite que la somme de leurs rayons
+				if (distance < (thisBubbleHitbox.radius + theOtherHitbox.radius))
+				{
+					noCollision = false;
+				}
+				else
+				{
+					noCollision = true;
+				}
+
+			}
+			
+		}
+
+	}
+
+	return noCollision;
+
 }

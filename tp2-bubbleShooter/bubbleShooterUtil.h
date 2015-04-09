@@ -10,7 +10,6 @@ namespace BubbleShooterUtil
 	extern const int SCREEN_HEIGHT;
 	extern const int SCREEN_WIDTH;
 	extern const int NB_COLORS;				//nombre de couleurs maximales
-	extern const int BUBBLE_RADIUS;			//rayon du cercle en pixels
 
 	/* Prototypes des fonctions
 	============================= */
@@ -23,4 +22,5 @@ namespace BubbleShooterUtil
 	void updateScreenWithSpriteSheet(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &currentSprite, SDL_Rect &position);
 	void initCharset(SDL_Rect charset[], int taille);
 	int setRandomValue(int maxValue);
+
 }

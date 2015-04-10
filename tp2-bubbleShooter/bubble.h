@@ -31,20 +31,25 @@ class Bubble
 	Circle hitbox;			//hitbox circulaire de la bulle
 
 	//Constructeur et destructeur
-	Bubble(int colorValue);
+	Bubble();
 	~Bubble();
 
 	//Setters
+	void setSprite(int colorValue);
 	void setHitbox(SDL_Rect &position, int radius);
 	void setVelocity(int velX, int velY);
 	
 	//Fonctions utilitaires
-	void move();
+	void move(bool &hasCollided);
+	bool checkCollisions(Bubble otherBubble);
 	void update(SDL_Surface *screen, int x, int y);
 	//void rotate(Orientation dir);
 
 	//Getters
+	SDL_Surface* getSpriteSheet();
 	SDL_Rect getPosition();
+	int getWidth();
+	int getHeight();
 	int getColor();
 	int getVelocityX();
 	int getVelocityY();

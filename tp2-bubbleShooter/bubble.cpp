@@ -2,14 +2,9 @@
 
 /* Constructeur de la classe "Bubble"
 ====================================== */
-Bubble::Bubble(int colorValue)
+Bubble::Bubble()
 {
-
-	spriteSheet = loadBitmap("bubble.bmp");
-	color = colorValue;
-	initCharset(sprite, NB_COLORS);
-	inGameStatus = true;
-
+	inGameStatus = false;
 }
 
 /* Destructeur de la classe "Bubble" 
@@ -18,6 +13,13 @@ Bubble::~Bubble()
 {
 	//Libérer la surface des bulles de la mémoire
 	SDL_FreeSurface(spriteSheet);
+}
+
+/*Retourne la position d'une bulle donnée
+========================================== */
+SDL_Surface* Bubble::getSpriteSheet()
+{
+	return spriteSheet;
 }
 
 /* Retourne la position d'une bulle donnée
@@ -32,6 +34,20 @@ SDL_Rect Bubble::getPosition()
 int Bubble::getColor() 
 {
 	return color;
+}
+
+/* Retourne la largeur d'une bulle donnée
+========================================== */
+int Bubble::getWidth() 
+{
+	return position.w;
+}
+
+/* Retourne la hauteur d'une bulle donnée
+========================================== */
+int Bubble::getHeight()
+{
+	return position.h;
 }
 
 /* Retourne la veleur indiquant si une bulle donnée a explosé (et est donc inaccessible)
@@ -62,6 +78,16 @@ Bubble::Circle Bubble::getHitbox()
 	return hitbox;
 }
 
+/* Assigne à la bulle un sprite donné et une couleur
+===================================================== */
+void Bubble::setSprite(int colorValue)
+{
+	spriteSheet = loadBitmap("bubble.bmp");
+	color = colorValue;
+	initCharset(sprite, NB_COLORS);
+	inGameStatus = true;
+}
+
 /* Calcule et assigne à la bulle une vitesse en X et en Y
 ============================================================= */
 void Bubble::setVelocity(int velX, int velY) 
@@ -82,14 +108,17 @@ void Bubble::setHitbox(SDL_Rect &position, int radius)
 	hitbox.centerY = position.y + BUBBLE_RADIUS;
 }
 
-/* Bouge une bulle dans l'espace et vérifie s'il y a des collisions avec le bord de l'écran
-============================================================================================= */
-void Bubble::move() 
+/* Bouge une bulle dans l'espace et vérifie s'il y a des collisions
+==================================================================== */
+void Bubble::move(bool &hasCollided) 
 {
-	//Si la position en X touche les murs de l'écran,  la vélocité en X s'inverse (multipliée par -1) et la bulle recule pour être collée au bord
-	//Puisque la bulle monte toujours, la vélocité en Y demeure inchangée ici. Elle sera plutôt vérifiée dans la fonction checkCollisions().
+	//Calcule et assigne à la bulle sa vélocité de base
+	//*********************************** TESTÉ ICI AVEC DES VALEURS ARBITRAIRES!!! ***********************************************
+	setVelocity(-3, 3);
 
-	if (position.x + 47 > SCREEN_WIDTH)		//si la balle touche le mur de droite
+	//Si la position en X touche les murs de l'écran,  la vélocité en X s'inverse (multipliée par -1) et la bulle recule pour être collée au bord
+
+	if (position.x + position.w > SCREEN_WIDTH)		//si la balle touche le mur de droite
 	{
 		int newVelocity = velocityX * (-1);
 		velocityX = newVelocity;
@@ -101,7 +130,14 @@ void Bubble::move()
 		velocityX = newVelocity;
 
 	}
-	
+
+	//Si elle touche le haut de l'écran, la vélocité en Y devient 0
+	if (position.y < 0)
+	{
+		velocityY = 0;
+		hasCollided = true;
+	}
+
 	//Bouge la bulle dans l'espace
 	position.x += velocityX;
 	position.y += velocityY;
@@ -119,4 +155,30 @@ void Bubble::update(SDL_Surface *screen, int x, int y)
 		updateScreenWithSpriteSheet(screen, spriteSheet, sprite[color], position);
 	 }
 	
+}
+
+/* Vérifie la collision entre deux bulles
+=========================================== */
+bool Bubble::checkCollisions(Bubble otherBubble)
+{
+	double distance;		//la distance entre deux bulles
+	bool hasCollision;		//flag déterminant s'il y a eu collision
+
+	hasCollision = false;	//initialisation du flag
+
+	//Calcule la distance entre les centres du cercle
+	distance = calculateDistance(hitbox.centerX, otherBubble.hitbox.centerX, hitbox.centerY, otherBubble.hitbox.centerY);
+
+	//Il y a collision si la distance entre les centres du cercles est plus petite que la somme de leurs rayons
+	if (distance < (hitbox.radius + otherBubble.hitbox.radius))
+	{
+		hasCollision = true;
+	}
+	else
+	{
+		hasCollision = false;
+	}
+
+	return hasCollision;
+
 }

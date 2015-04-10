@@ -4,9 +4,12 @@ using namespace std;
 
 namespace BubbleShooterUtil 
 {
+
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_WIDTH = 450;
 	const int NB_COLORS = 3;
+	/*const int GRID_HEIGHT = 10;
+	const int GRID_WIDTH = 8;*/
 
 	/* Initialise la SDL
 	====================== */
@@ -120,14 +123,22 @@ namespace BubbleShooterUtil
 	============================================ */
 	int setRandomValue(int maxValue)
 	{
-		int nb;
+		
+		srand(time(NULL));	//initialise le générateur de nombres aléatoires
+		
+		int random;
 
-		//do randomizer
+		random = (rand() % maxValue);		//génère un nombre aléatoire
 
-		return nb;
+		return random;
 	}
 
-
-
+	/* Calcule la distance entre deux points (Théorème de Pythagore)
+	================================================================== */
+	double calculateDistance(int x1, int x2, int y1, int y2) 
+	{
+		return sqrt((double)pow(x2 - x1, 2) + (double)pow(y2 - y1, 2));
+	}
+	
 }
 

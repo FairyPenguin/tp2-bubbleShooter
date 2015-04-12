@@ -27,6 +27,9 @@
     <ClCompile Include="bubble.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="gameGrid.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="canon.h">
@@ -36,6 +39,9 @@
       <Filter>Fichiers sources</Filter>
     </ClInclude>
     <ClInclude Include="bubble.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
+    <ClInclude Include="gameGrid.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
   </ItemGroup>

@@ -2,22 +2,36 @@
 
 /* Constructeur de la classe "Bubble"
 ====================================== */
-Bubble::Bubble()
+Bubble::Bubble() //: inGameStatus(false), velocityX(0), velocityY(0)
 {
 	inGameStatus = false;
+	velocityX = 0;
+	velocityY = 0;
+	//constructeur par défaut
+}
+
+Bubble::Bubble(int posX, int posY) //: inGameStatus(false), velocityX(0), velocityY(0)
+{
+	inGameStatus = false;
+	position.x = posX;
+	position.y = posY;
 }
 
 /* Destructeur de la classe "Bubble" 
 ====================================== */
 Bubble::~Bubble()
 {
-	//Libérer la surface des bulles de la mémoire
-	SDL_FreeSurface(spriteSheet);
+	//Libérer la surface des bulles de la mémoire si la surface est en jeu
+	if (inGameStatus)
+	{
+		SDL_FreeSurface(spriteSheet);
+	}
+	
 }
 
 /*Retourne la position d'une bulle donnée
 ========================================== */
-SDL_Surface* Bubble::getSpriteSheet()
+BubbleSprite* Bubble::getSpriteSheet()
 {
 	return spriteSheet;
 }
@@ -110,46 +124,31 @@ void Bubble::setHitbox(SDL_Rect &position, int radius)
 
 /* Bouge une bulle dans l'espace et vérifie s'il y a des collisions
 ==================================================================== */
-void Bubble::move(bool &hasCollided) 
+void Bubble::move() 
 {
-	//Calcule et assigne à la bulle sa vélocité de base
-	//*********************************** TESTÉ ICI AVEC DES VALEURS ARBITRAIRES!!! ***********************************************
-	setVelocity(-3, 3);
-
-	//Si la position en X touche les murs de l'écran,  la vélocité en X s'inverse (multipliée par -1) et la bulle recule pour être collée au bord
-
-	if (position.x + position.w > SCREEN_WIDTH)		//si la balle touche le mur de droite
+	//si la bulle n'a pas de vélocité, elle ne bouge pas.
+	if (velocityX == 0 && velocityY == 0)
 	{
-		int newVelocity = velocityX * (-1);
-		velocityX = newVelocity;
-
-	}
-	else if (position.x < 0)				//si la balle touche le mur de gauche
-	{
-		int newVelocity = velocityX * (-1);
-		velocityX = newVelocity;
-
+		return;
 	}
 
-	//Si elle touche le haut de l'écran, la vélocité en Y devient 0
-	if (position.y < 0)
+	if (hasCollidedWithWall())
 	{
-		velocityY = 0;
-		hasCollided = true;
+		velocityX *= -1;
 	}
 
-	//Bouge la bulle dans l'espace
 	position.x += velocityX;
 	position.y += velocityY;
 }
 
 /* Affiche la bulle à une position donnée dans l'écran
 ======================================================== */
-void Bubble::update(SDL_Surface *screen, int x, int y) 
+void Bubble::update(SDL_Surface *screen) 
  {
 	 if (inGameStatus)		//si les bulles sont bien en jeu
 	 {
-		setPosition(spriteSheet, position, x, y);
+		/*setPosition(spriteSheet, position, x, y);*/
+		move();
 		setHitbox(position, BUBBLE_RADIUS);
 		setTransparency(spriteSheet, 255, 255, 255);
 		updateScreenWithSpriteSheet(screen, spriteSheet, sprite[color], position);
@@ -159,26 +158,41 @@ void Bubble::update(SDL_Surface *screen, int x, int y)
 
 /* Vérifie la collision entre deux bulles
 =========================================== */
-bool Bubble::checkCollisions(Bubble otherBubble)
+bool Bubble::checkCollisions(Bubble* otherBubble)
 {
 	double distance;		//la distance entre deux bulles
-	bool hasCollision;		//flag déterminant s'il y a eu collision
 
-	hasCollision = false;	//initialisation du flag
-
-	//Calcule la distance entre les centres du cercle
-	distance = calculateDistance(hitbox.centerX, otherBubble.hitbox.centerX, hitbox.centerY, otherBubble.hitbox.centerY);
-
-	//Il y a collision si la distance entre les centres du cercles est plus petite que la somme de leurs rayons
-	if (distance < (hitbox.radius + otherBubble.hitbox.radius))
+	if (inGameStatus) 
 	{
-		hasCollision = true;
-	}
-	else
-	{
-		hasCollision = false;
+		//Calcule la distance entre les centres du cercle
+		distance = calculateDistance(hitbox.centerX, otherBubble->hitbox.centerX, hitbox.centerY, otherBubble->hitbox.centerY);
+
+		//Il y a collision si la distance entre les centres du cercles est plus petite que la somme de leurs rayons
+		if (distance < (hitbox.radius + otherBubble->hitbox.radius))
+		{
+			return true;
+		}
 	}
 
-	return hasCollision;
+	return false;
 
+}
+
+bool Bubble::hasCollidedWithWall()
+{
+	//Si elle touche le haut de l'écran, la vélocité en Y devient 0
+	if (position.y < 0)
+	{
+		velocityY = 0;
+		velocityX = 0;
+		return true;
+	}
+
+	return (position.x + position.w > SCREEN_WIDTH) || (position.x < 0);
+}
+
+void Bubble::setPosition(int x, int y)
+{
+	position.x = x;
+	position.y = y;
 }

@@ -10,8 +10,8 @@ class Canon
 
 		const int MAX_CANON_ANGLE = 60;
 		const int MIN_CANON_ANGLE = -60;
-		SDL_Surface *originalSprite;
-		SDL_Surface *displayedSprite;
+		Sprite *originalSprite;
+		Sprite *displayedSprite;
 		SDL_Rect position;
 		int angle;
 

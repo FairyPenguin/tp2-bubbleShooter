@@ -7,6 +7,9 @@
 namespace BubbleShooterUtil 
 {
 
+	typedef SDL_Surface Sprite;
+	typedef Sprite BubbleSprite;
+
 	///* Structures du projet
 	//======================== */
 	//struct GameGrid

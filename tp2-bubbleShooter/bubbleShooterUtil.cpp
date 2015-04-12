@@ -111,11 +111,11 @@ namespace BubbleShooterUtil
 		for (int x = 0; x < taille; x++)		//pour chaque ligne de l'image
 		{
 
-				charset[x].x = x * 47;		//position du posCharset sur l'axe des X
-				charset[x].y = 0;			//position de posCharset sur l'axe des Y
-				charset[x].w = 47;			//largeur en pixels du rectangle
-				charset[x].h = 47;			//hauteur en pixels du rectangle
-			}
+			charset[x].x = x * 47;		//position du posCharset sur l'axe des X
+			charset[x].y = 0;			//position de posCharset sur l'axe des Y
+			charset[x].w = 47;			//largeur en pixels du rectangle
+			charset[x].h = 47;			//hauteur en pixels du rectangle
+		}
 
 	}
 

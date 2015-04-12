@@ -82,12 +82,14 @@
     <ClCompile Include="bubble.cpp" />
     <ClCompile Include="bubbleShooterUtil.cpp" />
     <ClCompile Include="canon.cpp" />
+    <ClCompile Include="gameGrid.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bubble.h" />
     <ClInclude Include="bubbleShooterUtil.h" />
     <ClInclude Include="canon.h" />
+    <ClInclude Include="gameGrid.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

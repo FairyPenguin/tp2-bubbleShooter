@@ -3,13 +3,16 @@
 
 using namespace BubbleShooterUtil;
 
+#ifndef BUBBLE_HEADER
+#define BUBBLE_HEADER
+
 class Bubble
 {
 	private:
 
 	const int BUBBLE_RADIUS = 23;		//rayon de la bulle en pixels
 
-	SDL_Surface *spriteSheet;			//charset des bulles
+	BubbleSprite *spriteSheet;			//charset des bulles
 	SDL_Rect sprite[3];					//rectangle des bulles
 	SDL_Rect position;					//position de la bulle dans l'espace
 	int color;							//couleur de la bulle (0 - vert, 1 - rouge, 2 - jaune)
@@ -32,21 +35,24 @@ class Bubble
 
 	//Constructeur et destructeur
 	Bubble();
+	Bubble(int posX, int posY);
 	~Bubble();
 
 	//Setters
 	void setSprite(int colorValue);
 	void setHitbox(SDL_Rect &position, int radius);
 	void setVelocity(int velX, int velY);
+	void setPosition(int x, int y);
 	
 	//Fonctions utilitaires
-	void move(bool &hasCollided);
-	bool checkCollisions(Bubble otherBubble);
-	void update(SDL_Surface *screen, int x, int y);
+	void move();
+	bool checkCollisions(Bubble* otherBubble);
+	void update(SDL_Surface *screen);
+	bool hasCollidedWithWall();
 	//void rotate(Orientation dir);
 
 	//Getters
-	SDL_Surface* getSpriteSheet();
+	BubbleSprite* getSpriteSheet();
 	SDL_Rect getPosition();
 	int getWidth();
 	int getHeight();
@@ -57,3 +63,5 @@ class Bubble
 	Circle getHitbox();
 
 };
+
+#endif

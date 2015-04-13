@@ -15,7 +15,7 @@ private:
 	const double PI = 3.14159265358979323846;	//valeur de pi
 	static const int NB_COLORS = 3;				//nombre de couleurs que peut avoir une bulle
 
-	BubbleSprite *spriteSheet;			//charset des bulles
+	SDL_Surface *spriteSheet;			//charset des bulles
 	SDL_Rect sprite[3];					//sprite individuel de la bulle
 	SDL_Rect position;					//position de la bulle dans l'espace
 	int color;							//couleur de la bulle (0 - vert, 1 - rouge, 2 - jaune)
@@ -59,7 +59,7 @@ public:
 	bool hasCollidedWithWall();
 
 	//Getters
-	BubbleSprite* getSpriteSheet();
+	SDL_Surface* getSpriteSheet();
 	SDL_Rect getPosition();
 	int getWidth();
 	int getHeight();

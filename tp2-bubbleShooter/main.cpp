@@ -12,7 +12,7 @@ Description :  */
 
 /* ------ Amélie ---------- */
 //Vérifier changement de la bulleActive: il ne se fait pas correctement s'il touche le mur du haut.
-//Corriger gestion des collisions pour les bulles
+//Corriger gestion des collisions pour les bulles: la grille tend à se remplir à l'envers.
 //Insérer algorithme de destruction et de check des bulles adjacentes.
 
 
@@ -198,6 +198,7 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 	SDL_Event moveE;									//événement capté par SDL_PollEvent
 
 	int randomColor;									//couleur choisie au hasard
+	int newColor;										//nouvelle couleur assignée à une bulle donnée
 
 	bool gameIsActive;									//le jeu est actif
 	bool changeBubble;									//détermine si l'on doit changer de bulle ou non
@@ -231,6 +232,7 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 
 	SDL_EnableKeyRepeat(50, 50);
 
+	//prend le temps écoulé en millisecondes
 	long nextUpdateTimeInMilliseconds = clock();
 
 	while (gameIsActive)	//tant que le jeu est actif
@@ -241,6 +243,7 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 
 		nextUpdateTimeInMilliseconds += TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE;
 
+		//Charger l'écran avec toutes les images précédemment "blittées"
 		SDL_Flip(screen);
 
  		SDL_PollEvent(&moveE);	//événements de type Poll
@@ -277,11 +280,11 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 				if (changeBubble)
 				{
 					//insère la bulle au bon endroit dans la grille
-					bubbleGrid->stickBubbleInGrid(activeBubble);
+					/*bubbleGrid->stickBubbleInGrid(activeBubble);*/
 					
 					//la bulle active devient la prochaine bulle
-					activeBubble = nextBubble;
-					activeBubble->setPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25);
+					newColor = nextBubble->getColor();
+					activeBubble->setSprite(newColor);
 
 					//la prochaine bulle devient une nouvelle bulle
 					randomColor = getRandomValue(3);

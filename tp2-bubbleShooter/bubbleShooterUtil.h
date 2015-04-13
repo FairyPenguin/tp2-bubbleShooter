@@ -7,10 +7,6 @@
 namespace BubbleShooterUtil 
 {
 
-	//Permet de référencer le nom d'un type à un autre
-	typedef SDL_Surface Sprite;
-	typedef Sprite BubbleSprite;
-
 	/* Constantes du programme
 	=========================== */
 	extern const int SCREEN_HEIGHT;

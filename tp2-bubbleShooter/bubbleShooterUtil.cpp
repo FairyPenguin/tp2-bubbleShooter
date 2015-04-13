@@ -47,18 +47,18 @@ namespace BubbleShooterUtil
 	========================================== */
 	SDL_Surface* loadBitmap(char* imgName)
 	{
-		SDL_Surface* loadedImage = nullptr;		//Temporary storage for the image that's loaded
-		SDL_Surface* optimizedImage = nullptr;		//The optimized image that will be used
+		SDL_Surface* loadedImage = NULL;		//stocke temporairement l'image à charger
+		SDL_Surface* optimizedImage = NULL;		//l'image optimisée en format 32-bits
 
-		loadedImage = SDL_LoadBMP(imgName);		//Load the image
+		loadedImage = SDL_LoadBMP(imgName);		//Charge l'image
 
-		//If nothing went wrong in loading the image
+		//si l'image est bien chargée en mémoire
 		if (loadedImage != nullptr)
 		{
-			//Create an optimized image
+			//optimiser l'image en format 32-bits
 			optimizedImage = SDL_DisplayFormat(loadedImage);
 
-			//Free the old image
+			//libérer la surface de l'image temporaire de la mémoire
 			SDL_FreeSurface(loadedImage);
 		}
 
@@ -77,7 +77,7 @@ namespace BubbleShooterUtil
 	======================================================= */
 	void setTransparency(SDL_Surface *picture, int red, int green, int blue)
 	{
-		//If nothing went wrong in loading the image
+		//Si l'image est bien chargée en mémoire
 		if (picture != NULL)
 		{
 			SDL_SetColorKey(picture, SDL_SRCCOLORKEY | SDL_RLEACCEL, SDL_MapRGB(picture->format, red, green, blue));

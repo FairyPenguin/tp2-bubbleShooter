@@ -37,7 +37,7 @@ Bubble::~Bubble()
 
 /*Retourne la position d'une bulle donnée
 ========================================== */
-BubbleSprite* Bubble::getSpriteSheet()
+SDL_Surface* Bubble::getSpriteSheet()
 {
 	return spriteSheet;
 }
@@ -120,7 +120,9 @@ void Bubble::setVelocity(int velX, int velY)
 ============================================================= */
 void Bubble::setVelocity(int angle)
 {
-	double angleRadian = (angle + 180) * PI / 180;
+	double angleRadian = (angle + 180) * PI / 180;		//l'angle en radian est donné par l'angle du canon
+														//auquel on applique une rotation de 180 degrés,
+														//considérant que rotozoom tourne dans le sens horaire.
 
 	velocityX = SPEED_BUBBLE * sin(angleRadian);
 	velocityY = SPEED_BUBBLE * cos(angleRadian);
@@ -147,6 +149,7 @@ void Bubble::move()
 		return;
 	}
 
+	//si la bulle touche un mur, inverser la vélocité en X pour la faire aller de l'autre sens.
 	if (hasCollidedWithWall())
 	{
 		velocityX *= -1;
@@ -204,26 +207,35 @@ bool Bubble::hasCollidedWithWall()
 		return true;
 	}
 
+	//Vérifie si la bulle touche les murs de côté et retourne si la condition est vraie ou fausse
 	return (position.x + position.w >= SCREEN_WIDTH) || (position.x <= 0);
 }
 
+/* Assigne une position à une bulle donnée selon des valeurs passées en paramètre
+=================================================================================== */
 void Bubble::setPosition(int x, int y)
 {
 	position.x = x;
 	position.y = y;
 }
 
+/* Assigne une position à une bulle donnée à partir de la position d'un autre objet
+=================================================================================== */
 void Bubble::setPosition(SDL_Rect otherPosition)
 {
 	position.x = otherPosition.x;
 	position.y = otherPosition.y;
 }
 
+/* Assigne le statut en-jeu ou non à une bulle donnée
+======================================================= */
 void Bubble::setInGameStatus(bool status) 
 {
 	inGameStatus = status;
 }
 
+/* Initialise le charset des bulles dans le tableau sprite[]
+============================================================== */
 void Bubble::initCharset() 
 {
 	for (int x = 0; x < NB_COLORS; x++)		//pour chaque ligne de l'image

@@ -149,8 +149,6 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 	//initialisation des variables
 	activeBubblePos = activeBubble->getPosition();
 	shortestDistance = DBL_MAX;
-	shortestDistanceLine = 0;
-	shortestDistanceColumn = 0;
 
 	for (int i = 0; i < GRID_HEIGHT; i++)		//pour chaque ligne de la grille
 	{
@@ -160,16 +158,17 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 			bool status = bubble[i][j].getInGameStatus();
 
 			//Si la case est libre, vérifier la distance entre la bulle active et la case vide
-			if (!status)
-			{
+			/*if (!status)
+			{*/
 				distance = calculateDistance(activeBubblePos.x, otherBubblePos.x, activeBubblePos.y, otherBubblePos.y);
 
 				//Si la distance entre les deuxx points est la plus courte, prendre l'index correspondant en note
 				if (distance < shortestDistance)
 				{
+					shortestDistance = distance;
 					shortestDistanceLine = i;
 					shortestDistanceColumn = j;
-				}
+				/*}*/
 			}
 		}
 	}

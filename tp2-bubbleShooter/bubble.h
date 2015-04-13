@@ -8,19 +8,23 @@ using namespace BubbleShooterUtil;
 
 class Bubble
 {
-	private:
+private:
 
-	const int BUBBLE_RADIUS = 23;		//rayon de la bulle en pixels
+	static const int BUBBLE_RADIUS = 23;		//rayon de la bulle en pixels
+	static const int SPEED_BUBBLE = 6;			//vitesse de l'hypothénuse de la balle
+	const double PI = 3.14159265358979323846;	//valeur de pi
+	static const int NB_COLORS = 3;				//nombre de couleurs que peut avoir une bulle
 
 	BubbleSprite *spriteSheet;			//charset des bulles
-	SDL_Rect sprite[3];					//rectangle des bulles
+	SDL_Rect sprite[3];					//sprite individuel de la bulle
 	SDL_Rect position;					//position de la bulle dans l'espace
 	int color;							//couleur de la bulle (0 - vert, 1 - rouge, 2 - jaune)
 	int velocityX;						//velocité en X
 	int velocityY;						//velocité en Y
-	bool inGameStatus;					//identifie si la bulle est en-jeu (vrai) ou si elle a été détruite (faux)
+	bool inGameStatus;					//identifie si la bulle est en-jeu (vrai) ou si elle me l'est pas (faux)
+	
 
-	public:
+public:
 
 	/* Structures du programme
 	=========================== */
@@ -42,14 +46,17 @@ class Bubble
 	void setSprite(int colorValue);
 	void setHitbox(SDL_Rect &position, int radius);
 	void setVelocity(int velX, int velY);
+	void setVelocity(int angle);
 	void setPosition(int x, int y);
+	void setPosition(SDL_Rect otherPosition);
+	void setInGameStatus(bool status);
 	
 	//Fonctions utilitaires
 	void move();
+	void initCharset();
 	bool checkCollisions(Bubble* otherBubble);
 	void update(SDL_Surface *screen);
 	bool hasCollidedWithWall();
-	//void rotate(Orientation dir);
 
 	//Getters
 	BubbleSprite* getSpriteSheet();

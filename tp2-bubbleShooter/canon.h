@@ -30,6 +30,8 @@ class Canon
 		void rotate(Orientation dir);
 		int getWidth();
 		int getHeight();
+		SDL_Rect getPosition();
+		int getRotationAngle();
 
 		
 

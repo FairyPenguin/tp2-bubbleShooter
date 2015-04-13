@@ -7,9 +7,6 @@ namespace BubbleShooterUtil
 
 	const int SCREEN_HEIGHT = 600;
 	const int SCREEN_WIDTH = 450;
-	const int NB_COLORS = 3;
-	/*const int GRID_HEIGHT = 10;
-	const int GRID_WIDTH = 8;*/
 
 	/* Initialise la SDL
 	====================== */
@@ -103,25 +100,9 @@ namespace BubbleShooterUtil
 		SDL_BlitSurface(picture, &currentSprite, screen, &position);
 	}
 
-	/* Initialise le tableau des sprites d'un charset donné
-	========================================================= */
-	void initCharset(SDL_Rect charset[], int taille)
-	{
-
-		for (int x = 0; x < taille; x++)		//pour chaque ligne de l'image
-		{
-
-			charset[x].x = x * 47;		//position du posCharset sur l'axe des X
-			charset[x].y = 0;			//position de posCharset sur l'axe des Y
-			charset[x].w = 47;			//largeur en pixels du rectangle
-			charset[x].h = 47;			//hauteur en pixels du rectangle
-		}
-
-	}
-
 	/* Assigne et retourne une valeur aléatoire
 	============================================ */
-	int setRandomValue(int maxValue)
+	int getRandomValue(int maxValue)
 	{
 		
 		srand(time(NULL));	//initialise le générateur de nombres aléatoires

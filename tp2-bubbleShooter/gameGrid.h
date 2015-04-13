@@ -8,11 +8,11 @@ class GameGrid
 {
 private:
 
-	static const int GRID_HEIGHT = 10;
-	static const int GRID_WIDTH = 8;
+	static const int GRID_HEIGHT = 10;			//hauteur de la grille de jeu
+	static const int GRID_WIDTH = 8;			//largueur de la grille de jeu
 
-	SDL_Rect position;							//coordonnées en pixels de la grille
-	Bubble bubble[GRID_HEIGHT][GRID_WIDTH];		//bulle contenue dans la grille
+	SDL_Rect position;							//coordonnées en pixels d'une case dans la grille
+	Bubble bubble[GRID_HEIGHT][GRID_WIDTH];		//bulle contenue dans une case donnée de la grille
 	int offsetX;								//décalage en X de la grille par rapport à la position (0,0)
 
 
@@ -20,31 +20,15 @@ public:
 
 	//Constructeur et destructeur
 	GameGrid(int bubbleDiameter);
-	~GameGrid();
-
-	//Setters
+	void freeSurfaces();
 
 	//Fonctions utilitaires
 	void initPosition(int bubbleDiameter, int line, int column);
 	void insertLine(SDL_Surface *screen);
 	void update(SDL_Surface *screen);
-	void checkBubbleCollisions(Bubble* activeBubble);
-	void freeSurfaces();
-	/*void move(bool &hasCollided);
-	bool checkCollisions(Bubble otherBubble);
-	void update(SDL_Surface *screen, int x, int y);*/
-	//void rotate(Orientation dir);
-
-	//Getters
-
-	/*SDL_Surface* getSpriteSheet();
-	SDL_Rect getPosition();
-	int getWidth();
-	int getHeight();
-	int getColor();
-	int getVelocityX();
-	int getVelocityY();
-	bool getInGameStatus();
-	Circle getHitbox();*/
-
+	bool checkBubbleCollisions(Bubble* activeBubble);
+	bool checkActiveBubbleCollision(Bubble* activeBubble);
+	bool manageCollision(Bubble* &activeBubble);
+	void stickBubbleInGrid(Bubble* &activeBubble);
+	
 };

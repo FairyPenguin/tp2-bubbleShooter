@@ -4,23 +4,20 @@ Programme: Bubble Shooter
 Fichier: main.cpp
 Auteur : Amélie Frappier et Marc-Antoine Larose
 Date création : 23/03/2015
-Date modification: 11/04/2015
+Date modification: 12/04/2015
 Description :  */
 
 /* TODO: améliorations à apporter au programme
 ================================================= */
 
 /* ------ Amélie ---------- */
-//Conflit WaitEvent/PollEvent à règler. Conflit entre actions du canon et actions de la bulle. Je ne peux ni mettre la canon en PollEvent ou la bulle en WaitEvent... =/
-//Mon random y'est tout croche. Il redonne la même couleur presque tout le temps.
-//Calculer la vélocité correctement. On peut toutefois tester le reste avec des valeurs hardcodées en attendant
-//Règler changement vélocité en X quand on touche les coins. Il stick sur le bord.
-//Collision des bulles à déboguer. Ça overlap un peu... 
-//Check Bulles Adjacentes quand le moteur des collisions sera terminé. Ressortir le Démineur des boules à mites. LOL.
-//Continuer à cleaner le main parce que le main est vraiment trop long.
+//Vérifier changement de la bulleActive: il ne se fait pas correctement s'il touche le mur du haut.
+//Corriger gestion des collisions pour les bulles
+//Insérer algorithme de destruction et de check des bulles adjacentes.
+
 
 /* ------ Marc-Antoine ---------- */
-//Intégrer scoring
+//Intégrer module des scores
 //Intégrer SDL_ttf de façon portative
 
 
@@ -41,14 +38,7 @@ using namespace BubbleShooterUtil;
 const int GRID_HEIGHT = 10;
 const int GRID_WIDTH = 8;
 const int REFRESH_TIME = 600;
-
-///* Structures du projet
-//======================== */
-//struct GameGrid
-//{
-//	SDL_Rect position;				//position dans la grille
-//	Bubble bubble;					//bulle contenue dans la grille
-//};
+const int TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE = 16;
 
 /* Prototype des fonctions
 =========================== */
@@ -207,11 +197,10 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 {
 	SDL_Event moveE;									//événement capté par SDL_PollEvent
 
-	int currentTime;									//temps actuel
-	int previousTime;									//temps précédent
-	int bubbleCounter;									//compte le nombre de bulles en jeu
+	int randomColor;									//couleur choisie au hasard
 
 	bool gameIsActive;									//le jeu est actif
+	bool changeBubble;									//détermine si l'on doit changer de bulle ou non
 
 	GameGrid* bubbleGrid = new GameGrid(47);			//grille de jeu contenant les bulles
 
@@ -221,30 +210,40 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 	Bubble* nextBubble = new Bubble(SCREEN_WIDTH / 2 + 47, SCREEN_HEIGHT - 25);		//la prochaine bulle en jeu
 
 	//Initialisation des variables
-	bubbleCounter = 0;
-	previousTime = 0;
-	currentTime = 0;
 	gameIsActive = true;
 
 	//Redessiner l'écran avec le background pour faire disparaître le menu
 	updateScreen(screen, bg, bgPos);
+	
+	//Insérer une ligne de bulles dans la grille
+	bubbleGrid->insertLine(screen);
 
 	//Dessiner une première fois le canon, la bulle active et la prochaine bulle en jeu
 	canon->update(screen);
 
-	activeBubble->setSprite(0);
+	randomColor = getRandomValue(3);
+	activeBubble->setSprite(randomColor);
 	activeBubble->update(screen);
 
-	nextBubble->setSprite(1);
+	randomColor = getRandomValue(3);
+	nextBubble->setSprite(randomColor);
 	nextBubble->update(screen);
 
 	SDL_EnableKeyRepeat(50, 50);
 
+	long nextUpdateTimeInMilliseconds = clock();
+
 	while (gameIsActive)	//tant que le jeu est actif
 	{
+
+		//S'assure que le jeu roule à 60 Frames par Secondes (FPS)
+		while (nextUpdateTimeInMilliseconds > clock());
+
+		nextUpdateTimeInMilliseconds += TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE;
+
 		SDL_Flip(screen);
 
-		SDL_PollEvent(&moveE);		//événements de type Poll
+ 		SDL_PollEvent(&moveE);	//événements de type Poll
 		switch (moveE.type)
 		{
 
@@ -267,53 +266,38 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 				break;
 
 			case SDLK_SPACE:	//lance la bulle lorsque l'on appuie sur Espace
-
-				activeBubble->setVelocity(3, -3);
+				activeBubble->setPosition(canon->getPosition());
+				activeBubble->setVelocity(canon->getRotationAngle());
 				
-				//hasCollided = false;	//initialise le fait qu'il n'y a pas eu de collision
+				//Vérifie si la bulle entre en collision
+				changeBubble = bubbleGrid->manageCollision(activeBubble);
 
-				//if (!hasCollided)		//si la bulle n'a pas eu de collisions
-				//{
+				//Si la bulle active doit être changée, la prochaine bulle devient la bulle active
+				//et une nouvelle prochaine bulle prend sa place.
+				if (changeBubble)
+				{
+					//insère la bulle au bon endroit dans la grille
+					bubbleGrid->stickBubbleInGrid(activeBubble);
+					
+					//la bulle active devient la prochaine bulle
+					activeBubble = nextBubble;
+					activeBubble->setPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25);
 
-				//	currentTime = SDL_GetTicks();		//initialise le timer en prenant les valeurs réelles
+					//la prochaine bulle devient une nouvelle bulle
+					randomColor = getRandomValue(3);
+					nextBubble = new Bubble(SCREEN_WIDTH / 2 + 47, SCREEN_HEIGHT - 25);
+					nextBubble->setSprite(randomColor);
 
-				//	if (currentTime - previousTime > REFRESH_TIME)		//à chaque rafraichissement de l'image
-				//	{
-
-				//		//Vérifier les collisions pour chaque bulle présentement en jeu
-				//		hasCollided = checkBubbleCollisions(activeBubble, bubbleGrid);
-				//		if (!hasCollided)
-				//		{
-				//			activeBubble->move();
-				//			currentTime = previousTime;
-				//		}
-				//		else
-				//		{
-				//			//on endort le programme pour ne pas qu'il prenne trop de CPU
-				//			SDL_Delay(REFRESH_TIME - (previousTime - currentTime));
-				//		}
-				//	}
-				//		
-				//	//si la bulle ne bouge plus car elle est entrée en contact avec quelque chose, 
-				//	//changer la bulle active pour la prochaine bulle, et générer une nouvelle prochaine bulle
-				//	if (hasCollided)
-				//	{
-
-				//		activeBubble = nextBubble;
-				//		int randColor = setRandomValue(NB_COLORS);
-				//		nextBubble = new Bubble();
-				//		nextBubble->setSprite(randColor);
-				//	}
-
-				/*checkSurroundingBubbles(activeBubble, bubbleArray[])*/
+				}
 				break;
 			}
 			break;
 		}
 
-		//Mettre à jour l'écran après chaque itération de la boucle
+		//Mettre à jour l'écran
 		updateScreen(screen, bg, bgPos);
 
+		//Mettre à jour la grille des bulles
 		bubbleGrid->update(screen);
 
 		//Mettre à jour le canon, la bulle active et la prochaine bulle 
@@ -323,6 +307,8 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 		
 	}
 
+	//Libère les surfaces de la grille de jeu
+	bubbleGrid->freeSurfaces();
 	delete canon;
 	delete activeBubble;
 	delete nextBubble;
@@ -330,71 +316,3 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 }
 
 
-///* Initialise les positions de la grille
-//========================================== */
-//void initGameGrid(GameGrid grid[GRID_HEIGHT][GRID_WIDTH]) 
-//{
-//	for (int i = 0; i < GRID_HEIGHT; i++)		//pour chaque ligne de la grille
-//	{
-//
-//		for (int j = 0; j < GRID_WIDTH; j++)		//pour chaque colonne de la grille
-//		{
-//
-//			grid[i][j].initialize(47, i ,j);
-//			
-//			//grid[i][j].position.x = 47 * j + 10;		//il y a 10 pixels de décalage en X par rapport à la position de départ (0,0)
-//			//grid[i][j].position.y = 47 * i;
-//			//grid[i][j].position.h = 47;
-//			//grid[i][j].position.w = 47;
-//
-//		}
-//
-//	}
-//}
-
-///* Insére une ligne de bulles dans la grille
-//============================================== */
-//void insertLine(SDL_Surface *screen, GameGrid grid[GRID_HEIGHT][GRID_WIDTH])
-//{
-//
-//	for (int i = 0; i < GRID_WIDTH; i++)		//pour chaque case de la première ligne (index 0)
-//	{
-//		int randColor = setRandomValue(NB_COLORS);
-//		grid[0][i].bubble.setSprite(randColor);
-//		grid[0][i].bubble.update(screen, grid[0][i].position.x, grid[0][i].position.y);
-//
-//	}
-//
-//}															
-
-/* Vérifie la collision de bulles dans l'aire de jeu
-======================================================= */
-//bool checkBubbleCollisions(Bubble *thisBubble, GameGrid grid[GRID_HEIGHT][GRID_WIDTH]) 
-//{
-//	
-//	bool collision = false;		//flag indiquant s'il y a eu collision
-//	bool status;				//indique si la bulle vérifiée dans la grille est bien en-jeu et affichée à l'écran
-//	
-//	for (int i = 0; i < GRID_HEIGHT; i++)		//pour chaque ligne de la grille
-//	{
-//
-//		for (int j = 0; j < GRID_WIDTH; j++)		//pour chaque colonne de la grille
-//		{
-//
-//			//si la bulle est présentement en jeu, 
-//			//vérifier si la bulle courante entre en collision avec elle
-//			//si et seulement si on n'a pas déjà trouvé de collision au préalable
-//
-//			bool status = grid[i][j].bubble.getInGameStatus();
-//			if (status && !collision)
-//			{
-//				collision = thisBubble->checkCollisions(grid[i][j].bubble);
-//			}
-//
-//		}
-//
-//	}
-//
-//	return collision;
-//
-//}

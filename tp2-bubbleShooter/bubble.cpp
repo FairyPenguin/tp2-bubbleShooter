@@ -1,27 +1,33 @@
 #include "bubble.h"
 
+
 /* Constructeur de la classe "Bubble"
 ====================================== */
-Bubble::Bubble() //: inGameStatus(false), velocityX(0), velocityY(0)
+Bubble::Bubble()	//constructeur par défaut
 {
 	inGameStatus = false;
 	velocityX = 0;
 	velocityY = 0;
-	//constructeur par défaut
+	position.w = 47;
+	position.h = 47;
 }
 
-Bubble::Bubble(int posX, int posY) //: inGameStatus(false), velocityX(0), velocityY(0)
+Bubble::Bubble(int posX, int posY)	//constructeur assignant une position donnée à la bulle
 {
 	inGameStatus = false;
 	position.x = posX;
 	position.y = posY;
+	velocityX = 0;
+	velocityY = 0;
+	position.w = 47;
+	position.h = 47;
 }
 
 /* Destructeur de la classe "Bubble" 
 ====================================== */
 Bubble::~Bubble()
 {
-	//Libérer la surface des bulles de la mémoire si la surface est en jeu
+	//Libérer la surface de la bulle seulement si elle n'Eest pas déjà en jeu
 	if (inGameStatus)
 	{
 		SDL_FreeSurface(spriteSheet);
@@ -98,7 +104,7 @@ void Bubble::setSprite(int colorValue)
 {
 	spriteSheet = loadBitmap("bubble.bmp");
 	color = colorValue;
-	initCharset(sprite, NB_COLORS);
+	initCharset();
 	inGameStatus = true;
 }
 
@@ -106,9 +112,18 @@ void Bubble::setSprite(int colorValue)
 ============================================================= */
 void Bubble::setVelocity(int velX, int velY) 
 {
-	//TODO: Calculs dans cette section pour trouver la bonne vélocité. Va falloir faire un peu de maths.
 	velocityX = velX;
 	velocityY = velY;
+}
+
+/* Calcule et assigne à la bulle une vitesse en X et en Y selon l'angle du canon
+============================================================= */
+void Bubble::setVelocity(int angle)
+{
+	double angleRadian = (angle + 180) * PI / 180;
+
+	velocityX = SPEED_BUBBLE * sin(angleRadian);
+	velocityY = SPEED_BUBBLE * cos(angleRadian);
 }
 
 /* Met en place la hitbox de la bulle
@@ -147,7 +162,6 @@ void Bubble::update(SDL_Surface *screen)
  {
 	 if (inGameStatus)		//si les bulles sont bien en jeu
 	 {
-		/*setPosition(spriteSheet, position, x, y);*/
 		move();
 		setHitbox(position, BUBBLE_RADIUS);
 		setTransparency(spriteSheet, 255, 255, 255);
@@ -178,21 +192,45 @@ bool Bubble::checkCollisions(Bubble* otherBubble)
 
 }
 
+/* Vérifie la collision entre une bulle et le mur
+=================================================== */
 bool Bubble::hasCollidedWithWall()
 {
 	//Si elle touche le haut de l'écran, la vélocité en Y devient 0
-	if (position.y < 0)
+	if (position.y <= 0)
 	{
 		velocityY = 0;
 		velocityX = 0;
 		return true;
 	}
 
-	return (position.x + position.w > SCREEN_WIDTH) || (position.x < 0);
+	return (position.x + position.w >= SCREEN_WIDTH) || (position.x <= 0);
 }
 
 void Bubble::setPosition(int x, int y)
 {
 	position.x = x;
 	position.y = y;
+}
+
+void Bubble::setPosition(SDL_Rect otherPosition)
+{
+	position.x = otherPosition.x;
+	position.y = otherPosition.y;
+}
+
+void Bubble::setInGameStatus(bool status) 
+{
+	inGameStatus = status;
+}
+
+void Bubble::initCharset() 
+{
+	for (int x = 0; x < NB_COLORS; x++)		//pour chaque ligne de l'image
+	{
+		sprite[x].x = x * 47;		//position du posCharset sur l'axe des X
+		sprite[x].y = 0;			//position de posCharset sur l'axe des Y
+		sprite[x].w = 47;			//largeur en pixels du rectangle
+		sprite[x].h = 47;			//hauteur en pixels du rectangle
+	}
 }

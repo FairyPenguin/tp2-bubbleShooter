@@ -57,3 +57,17 @@ void Canon::rotate(Orientation dir)
 		break;
 	}
 }
+
+/* Retourne la position du canon
+============================================ */
+SDL_Rect Canon::getPosition()
+{
+	return position;
+}
+
+/* Retourne l'angle de rotation du canon
+============================================ */
+int Canon::getRotationAngle()
+{
+	return angle;
+}

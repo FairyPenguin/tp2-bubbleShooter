@@ -1,12 +1,9 @@
-﻿La génération a démarré 2015-04-13 00:53:59.
+﻿La génération a démarré 2015-04-13 01:34:34.
      1>Projet "D:\Documents\Amélie\HDD Backup Amélie\tp2-bubbleShooter\tp2-bubbleShooter\tp2-bubbleShooter.vcxproj" sur le nœud 2 (Build cible(s)).
      1>ClCompile:
-         D:\Program Files (x86)\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt bubble.cpp bubbleShooterUtil.cpp canon.cpp gameGrid.cpp main.cpp
+         D:\Program Files (x86)\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt bubble.cpp gameGrid.cpp main.cpp
          main.cpp
          gameGrid.cpp
-         canon.cpp
-         bubbleShooterUtil.cpp
-     1>d:\documents\amélie\hdd backup amélie\tp2-bubbleshooter\tp2-bubbleshooter\bubbleshooterutil.cpp(108): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
          bubble.cpp
      1>d:\documents\amélie\hdd backup amélie\tp2-bubbleshooter\tp2-bubbleshooter\bubble.cpp(127): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
      1>d:\documents\amélie\hdd backup amélie\tp2-bubbleshooter\tp2-bubbleshooter\bubble.cpp(128): warning C4244: '=' : conversion de 'double' en 'int', perte possible de données
@@ -22,4 +19,4 @@
 
 La génération a réussi.
 
-Temps écoulé 00:00:01.89
+Temps écoulé 00:00:01.69

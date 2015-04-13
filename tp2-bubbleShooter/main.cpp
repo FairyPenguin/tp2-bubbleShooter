@@ -5,7 +5,9 @@ Fichier: main.cpp
 Auteur : Amélie Frappier et Marc-Antoine Larose
 Date création : 23/03/2015
 Date modification: 12/04/2015
-Description :  */
+Description :  Dans le jeu Bubble Shooter, il faut faire des combinaisons de 3 bulles de même couleur ou plus pour les faire disparaître de la grille de jeu.
+En usant des flèches, le joueur fait tourner un canon dans la direction voulue, et en appuyant sur Espace, il tire une bulle dans l'aire de jeu. En touchant une bulle, 
+le jeu vérifie s'il y a 3 couleurs identiques ou plus autour de lui: si c'est le cas, les bulles disparaissent. Si les bulles descendent trop bas, le jeu se termine.*/
 
 /* TODO: améliorations à apporter au programme
 ================================================= */
@@ -13,6 +15,7 @@ Description :  */
 /* ------ Amélie ---------- */
 //Vérifier changement de la bulleActive: il ne se fait pas correctement s'il touche le mur du haut.
 //Corriger gestion des collisions pour les bulles: la grille tend à se remplir à l'envers.
+//Gestion de collisions entre bulles non fonctionnelle.
 //Insérer algorithme de destruction et de check des bulles adjacentes.
 
 
@@ -244,7 +247,7 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 		nextUpdateTimeInMilliseconds += TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE;
 
 		//Charger l'écran avec toutes les images précédemment "blittées"
-		SDL_Flip(screen);
+ 		SDL_Flip(screen);
 
  		SDL_PollEvent(&moveE);	//événements de type Poll
 		switch (moveE.type)

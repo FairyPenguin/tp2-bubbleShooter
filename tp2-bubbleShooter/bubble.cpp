@@ -185,7 +185,7 @@ bool Bubble::checkCollisions(Bubble* otherBubble)
 		distance = calculateDistance(hitbox.centerX, otherBubble->hitbox.centerX, hitbox.centerY, otherBubble->hitbox.centerY);
 
 		//Il y a collision si la distance entre les centres du cercles est plus petite que la somme de leurs rayons
-		if (distance < (hitbox.radius + otherBubble->hitbox.radius))
+		if (distance <= (hitbox.radius + otherBubble->hitbox.radius))
 		{
 			return true;
 		}

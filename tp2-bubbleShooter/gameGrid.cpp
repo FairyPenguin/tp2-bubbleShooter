@@ -57,11 +57,11 @@ bool GameGrid::manageCollision(Bubble* &activeBubble)
 	{
 		//Stoppe le mouvement de la bulle
 		activeBubble->setVelocity(0, 0);
-		return true;
-
+		
 		//insère la bulle au bon endroit dans la grille
-		stickBubbleInGrid(activeBubble);
+		/*stickBubbleInGrid(activeBubble);*/
 
+		return true;
 	}
 
 	return false;
@@ -71,9 +71,21 @@ bool GameGrid::manageCollision(Bubble* &activeBubble)
 ============================================================================================= */
 bool GameGrid::checkActiveBubbleCollision(Bubble* activeBubble)
 {
+	bool hasCollided;		//flag indiquant la collision
+	hasCollided = false;
+	
 	SDL_Rect activeBubblePosition = activeBubble->getPosition();
 
-	return (activeBubblePosition.y <= 0) || checkBubbleCollisions(activeBubble);
+	//Si la bulle est en haut de l'écran, il y a collision
+	if (activeBubblePosition.y <= 0)
+	{
+		hasCollided = true;
+	}
+
+	//Vérifier si la bulle en touche une autre dans la grille de jeu
+	hasCollided = checkBubbleCollisions(activeBubble);
+
+	return hasCollided;
 }
 
 /* Vérifie s'il y a collision pour chaque bulle de la grille de jeu
@@ -81,7 +93,7 @@ bool GameGrid::checkActiveBubbleCollision(Bubble* activeBubble)
 bool GameGrid::checkBubbleCollisions(Bubble* activeBubble)
 {
 	
-	bool hasCollided;		//flage déterminant s'il y a bien eu collision 
+	bool hasCollided;		//flag déterminant s'il y a bien eu collision 
 
 	//initialisation des variables
 	hasCollided = false;

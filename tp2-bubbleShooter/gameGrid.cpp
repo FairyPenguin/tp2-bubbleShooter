@@ -59,7 +59,7 @@ bool GameGrid::manageCollision(Bubble* &activeBubble)
 		activeBubble->setVelocity(0, 0);
 		
 		//insère la bulle au bon endroit dans la grille
-		/*stickBubbleInGrid(activeBubble);*/
+		stickBubbleInGrid(activeBubble);
 
 		return true;
 	}
@@ -109,6 +109,7 @@ bool GameGrid::checkBubbleCollisions(Bubble* activeBubble)
 				if (bubble[i][j].checkCollisions(activeBubble))
 				{
 					hasCollided = true;
+					break;
 				}
 			}
 			
@@ -137,7 +138,7 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 {
 
 	double distance;						//distance entre les cases inoccupées de la grille et la bulle active
-	double shortestDistance = DBL_MAX;		//stocke la valeur de la distance la plus courte
+	double shortestDistance;		//stocke la valeur de la distance la plus courte
 	int shortestDistanceLine;				//ligne où se trouve la distance la plus courte
 	int shortestDistanceColumn;				//colonne où se trouve la distance la plus courte
 	int newColor;							//nouvelle couleur de la bulle active
@@ -145,7 +146,11 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 	SDL_Rect activeBubblePos;				//position courante de la bulle active
 	SDL_Rect otherBubblePos;				//position courante de la bulle à comparer
 
+	//initialisation des variables
 	activeBubblePos = activeBubble->getPosition();
+	shortestDistance = DBL_MAX;
+	shortestDistanceLine = 0;
+	shortestDistanceColumn = 0;
 
 	for (int i = 0; i < GRID_HEIGHT; i++)		//pour chaque ligne de la grille
 	{

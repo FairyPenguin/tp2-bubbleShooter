@@ -1,3 +1,14 @@
+/* En-tête du programme
+=========================
+Programme: Bubble Shooter
+Fichier: bubble.h
+Auteur : Amélie Frappier et Marc-Antoine Larose
+Date création : 23/03/2015
+Date modification: 12/04/2015
+Description :  Classe Bubble du jeu Bubble Shooter */
+
+/* Directives au pré-processeur
+================================= */
 #include "bubbleShooterUtil.h"
 #include "../SDL/SDL.h"
 
@@ -6,6 +17,8 @@ using namespace BubbleShooterUtil;
 #ifndef BUBBLE_HEADER
 #define BUBBLE_HEADER
 
+/* Définition de la classe
+=========================== */
 class Bubble
 {
 private:

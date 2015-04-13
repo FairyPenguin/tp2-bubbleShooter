@@ -1,9 +1,22 @@
+/* En-tête du programme
+=========================
+Programme: Bubble Shooter
+Fichier: gameGrid.h
+Auteur : Amélie Frappier et Marc-Antoine Larose
+Date création : 23/03/2015
+Date modification: 12/04/2015
+Description :  Classe GameGrid du jeu Bubble Shooter */
+
+/* Directives au pré-processeur
+================================= */
 #include "bubbleShooterUtil.h"
 #include "../SDL/SDL.h"
 #include "bubble.h"
 
 using namespace BubbleShooterUtil;
 
+/* Définition de la classe
+================================= */
 class GameGrid
 {
 private:

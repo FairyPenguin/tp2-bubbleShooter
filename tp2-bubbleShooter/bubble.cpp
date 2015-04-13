@@ -155,6 +155,7 @@ void Bubble::move()
 		velocityX *= -1;
 	}
 
+	//Déplacement dans l'espace et réinitialisation de la hitbox
 	position.x += velocityX;
 	position.y += velocityY;
 }

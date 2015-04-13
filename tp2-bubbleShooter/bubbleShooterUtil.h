@@ -1,3 +1,12 @@
+/* En-tête du programme
+=========================
+Programme: Bubble Shooter
+Fichier: bubbleShooterUtil
+Auteur : Amélie Frappier et Marc-Antoine Larose
+Date création : 23/03/2015
+Date modification: 12/04/2015
+Description :  Fonctions utilitaires du jeu Bubble Shooter */
+
 /* Directives au pré-processeur
 ================================= */
 #include <iostream>

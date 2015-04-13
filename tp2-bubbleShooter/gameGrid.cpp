@@ -103,19 +103,19 @@ bool GameGrid::checkBubbleCollisions(Bubble* activeBubble)
 		for (int j = 0; j < GRID_WIDTH; j++)		//pour chaque colonne de la grille
 		{
 
-			//vérifier seulement s'il n'y a pas eu collision encore
-			if (!hasCollided)
+			if (bubble[i][j].checkCollisions(activeBubble))
 			{
-				if (bubble[i][j].checkCollisions(activeBubble))
-				{
-					hasCollided = true;
-					break;
-				}
+				hasCollided = true;
+				break;
 			}
-			
-		}
-	}
 
+		}
+		if (hasCollided)
+		{
+			break;
+		}
+
+	}
 	return hasCollided;
 }
 
@@ -165,9 +165,9 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 				//Si la distance entre les deuxx points est la plus courte, prendre l'index correspondant en note
 				if (distance < shortestDistance)
 				{
-					shortestDistance = distance;
 					shortestDistanceLine = i;
 					shortestDistanceColumn = j;
+					shortestDistance = distance;
 				/*}*/
 			}
 		}

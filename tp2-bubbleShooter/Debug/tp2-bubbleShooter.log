@@ -1,4 +1,4 @@
-﻿La génération a démarré 2015-04-13 02:28:48.
+﻿La génération a démarré 2015-04-14 00:15:11.
      1>Projet "D:\Documents\Amélie\HDD Backup Amélie\tp2-bubbleShooter\tp2-bubbleShooter\tp2-bubbleShooter.vcxproj" sur le nœud 2 (Build cible(s)).
      1>ClCompile:
          D:\Program Files (x86)\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MD /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt gameGrid.cpp
@@ -14,4 +14,4 @@
 
 La génération a réussi.
 
-Temps écoulé 00:00:00.52
+Temps écoulé 00:00:00.48

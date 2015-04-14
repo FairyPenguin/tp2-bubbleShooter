@@ -188,6 +188,8 @@ bool Bubble::checkCollisions(Bubble* otherBubble)
 		//Il y a collision si la distance entre les centres du cercles est plus petite que la somme de leurs rayons
 		if (distance <= (hitbox.radius + otherBubble->hitbox.radius))
 		{
+			velocityX = 0;
+			velocityY = 0;
 			return true;
 		}
 	}

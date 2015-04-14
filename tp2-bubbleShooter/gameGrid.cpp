@@ -35,6 +35,46 @@ void GameGrid::insertLine(SDL_Surface *screen)
 
 }
 
+/* Décale le tableau d'une ligne avant d'en insérer une nouvelle
+================================================================= */
+void GameGrid::shiftGridLines(SDL_Surface *screen)
+{
+
+	//Décale les bulles de la première ligne à l'avant-dernière ligne.
+
+	for (int i = (GRID_HEIGHT - 2); i > 0 ; i--)		//pour chaque ligne de la grille
+	{
+		for (int j = 0; j < GRID_WIDTH; j++)		//pour chaque colonne de la grille
+		{
+			bool status = bubble[i][j].getInGameStatus();
+
+			//Si la bulle est affichée, la descendre d'un étage
+			if (status)
+			{
+				int newColor = bubble[i][j].getColor();
+				bubble[i - 1][j].setSprite(newColor);
+
+			}
+
+			//Autrement, indiquer à l'étage plus bas que la bulle du dessus n'existe pas
+			else
+			{
+				bubble[i - 1][j].setInGameStatus(false);
+			}
+		}
+	}
+
+	//Retirer toutes les images des bulles existantes dans l'avant-dernière ligne.
+	for (int i = 0; i < GRID_WIDTH; i++)
+	{
+		bubble[8][i].setInGameStatus(false);
+	}
+
+	//Insère une ligne dans la première ligne
+	insertLine(screen);
+
+}
+
 /* Met à jour l'affichage des bulles dans la grille de jeu
 ============================================================ */
 void GameGrid::update(SDL_Surface *screen) 
@@ -81,9 +121,11 @@ bool GameGrid::checkActiveBubbleCollision(Bubble* activeBubble)
 	{
 		hasCollided = true;
 	}
-
-	//Vérifier si la bulle en touche une autre dans la grille de jeu
-	hasCollided = checkBubbleCollisions(activeBubble);
+	else
+	{
+		//Vérifier si la bulle en touche une autre dans la grille de jeu
+		hasCollided = checkBubbleCollisions(activeBubble);
+	}
 
 	return hasCollided;
 }
@@ -158,8 +200,8 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 			bool status = bubble[i][j].getInGameStatus();
 
 			//Si la case est libre, vérifier la distance entre la bulle active et la case vide
-			/*if (!status)
-			{*/
+			if (!status)
+			{
 				distance = calculateDistance(activeBubblePos.x, otherBubblePos.x, activeBubblePos.y, otherBubblePos.y);
 
 				//Si la distance entre les deuxx points est la plus courte, prendre l'index correspondant en note
@@ -168,7 +210,7 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 					shortestDistanceLine = i;
 					shortestDistanceColumn = j;
 					shortestDistance = distance;
-				/*}*/
+				}
 			}
 		}
 	}
@@ -176,7 +218,26 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 	//Met la bulle active dnas la grille au bon endroit
 	newColor = activeBubble->getColor();
 	bubble[shortestDistanceLine][shortestDistanceColumn].setSprite(newColor);
-
 	
+}
+
+/* Vérifie si la grille contient quelque chose dans la 10e ligne
+================================================================= */
+bool GameGrid::checkLastLine()
+{
+	bool status;
+
+	for (int i = 0; i < GRID_WIDTH; i++)	//pour chaque case de la 10e ligne	
+	{
+		status = bubble[9][i].getInGameStatus();
+
+		//s'il y a de quoi à la 10e ligne, renvoyer le flag correspondant
+		if (status)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 

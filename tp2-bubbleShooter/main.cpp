@@ -11,18 +11,8 @@ le jeu vérifie s'il y a 3 couleurs identiques ou plus autour de lui: si c'est le
 
 /* TODO: améliorations à apporter au programme
 ================================================= */
-
-/* ------ Amélie ---------- */
-//Vérifier changement de la bulleActive: il ne se fait pas correctement s'il touche le mur du haut.
-//Corriger gestion des collisions pour les bulles: la grille tend à se remplir à l'envers.
-//Gestion de collisions entre bulles non fonctionnelle.
 //Insérer algorithme de destruction et de check des bulles adjacentes.
-
-
-/* ------ Marc-Antoine ---------- */
-//Intégrer module des scores
-//Intégrer SDL_ttf de façon portative
-
+//Les destructeurs ne fonctionnenent pas correctement
 
 /* Directives au pré-processeur
 ================================= */
@@ -42,14 +32,13 @@ const int GRID_HEIGHT = 10;
 const int GRID_WIDTH = 8;
 const int REFRESH_TIME = 600;
 const int TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE = 16;
+const int TIME_BETWEEN_INSERT = 5000;
 
 /* Prototype des fonctions
 =========================== */
 void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &screenIsActive);
-void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &screenIsActive);
-void initGameGrid(GameGrid grid[GRID_HEIGHT][GRID_WIDTH]);
-void insertLine(SDL_Surface *screen, GameGrid grid[GRID_HEIGHT][GRID_WIDTH]);
-bool checkBubbleCollisions(Bubble *thisBubble, GameGrid grid[GRID_HEIGHT][GRID_WIDTH]);
+void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, SDL_Surface *logo, SDL_Rect &logoPos, SDL_Surface *menu, SDL_Rect &menuPos, bool &screenIsActive);
+bool checkIfGameContinues(GameGrid grid[GRID_HEIGHT][GRID_WIDTH]);
 
 
 /* Méthode principale
@@ -122,7 +111,7 @@ int main(int argc, char *argv[])
 
 
 			case SDLK_SPACE:	//si on appuie sur Espace, appeler la fonction playGame();
-				playGame(screen, background, bgPosition, isActive);
+				playGame(screen, background, bgPosition, game_logo, logoPosition, menu_rect, menuPosition, isActive);
 				break;
 
 			}
@@ -196,7 +185,7 @@ void showRules(SDL_Surface *screen, SDL_Surface *menu, SDL_Rect &menuPos, bool &
 
 /* Démarre le jeu en tant que tel
 ===================================== */
-void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &screenIsActive)
+void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, SDL_Surface *logo, SDL_Rect &logoPos, SDL_Surface *menu, SDL_Rect &menuPos, bool &screenIsActive)
 {
 	SDL_Event moveE;									//événement capté par SDL_PollEvent
 
@@ -204,7 +193,8 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 	int newColor;										//nouvelle couleur assignée à une bulle donnée
 
 	bool gameIsActive;									//le jeu est actif
-	bool changeBubble;									//détermine si l'on doit changer de bulle ou non
+	bool hasLost;										//flage déterminant si le jeu a été gagné ou perdu
+	bool bubbleHasCollided;								//détermine si la bulle active a collisionné ou non
 
 	GameGrid* bubbleGrid = new GameGrid(47);			//grille de jeu contenant les bulles
 
@@ -215,6 +205,8 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 
 	//Initialisation des variables
 	gameIsActive = true;
+	hasLost = false;
+	bubbleHasCollided = false;
 
 	//Redessiner l'écran avec le background pour faire disparaître le menu
 	updateScreen(screen, bg, bgPos);
@@ -237,6 +229,7 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 
 	//prend le temps écoulé en millisecondes
 	long nextUpdateTimeInMilliseconds = clock();
+	long nextInsertTime = nextUpdateTimeInMilliseconds + TIME_BETWEEN_INSERT;
 
 	while (gameIsActive)	//tant que le jeu est actif
 	{
@@ -245,6 +238,14 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 		while (nextUpdateTimeInMilliseconds > clock());
 
 		nextUpdateTimeInMilliseconds += TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE;
+
+		//Insère une ligne à la grille à toutes les 30 secondes
+		if (nextInsertTime <= clock())
+		{
+			/*bubbleGrid->insertLine(screen);*/
+			bubbleGrid->shiftGridLines(screen);
+			nextInsertTime += TIME_BETWEEN_INSERT;
+		}
 
 		//Charger l'écran avec toutes les images précédemment "blittées"
  		SDL_Flip(screen);
@@ -271,33 +272,30 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 				canon->rotate(Canon::RIGHT);
 				break;
 
-			case SDLK_SPACE:	//lance la bulle lorsque l'on appuie sur Espace
-				activeBubble->setPosition(canon->getPosition());
+			case SDLK_SPACE:	//lance la bulle lorsque l'on appuie sur Espace	
 				activeBubble->setVelocity(canon->getRotationAngle());
-				
-				//Vérifie si la bulle entre en collision
-				changeBubble = bubbleGrid->manageCollision(activeBubble);
-
-				//Si la bulle active doit être changée, la prochaine bulle devient la bulle active
-				//et une nouvelle prochaine bulle prend sa place.
-				if (changeBubble)
-				{
-					//insère la bulle au bon endroit dans la grille
-					/*bubbleGrid->stickBubbleInGrid(activeBubble);*/
-					
-					//la bulle active devient la prochaine bulle
-					newColor = nextBubble->getColor();
-					activeBubble->setSprite(newColor);
-
-					//la prochaine bulle devient une nouvelle bulle
-					randomColor = getRandomValue(3);
-					nextBubble = new Bubble(SCREEN_WIDTH / 2 + 47, SCREEN_HEIGHT - 25);
-					nextBubble->setSprite(randomColor);
-
-				}
 				break;
 			}
 			break;
+		}
+
+		//Vérifie si la bulle entre en collision
+		bubbleHasCollided = bubbleGrid->manageCollision(activeBubble);
+
+		//Si la bulle active doit être changée, la prochaine bulle devient la bulle active
+		//et une nouvelle prochaine bulle prend sa place.
+		if (bubbleHasCollided)
+		{	
+			//la bulle active devient la prochaine bulle
+			newColor = nextBubble->getColor();
+			activeBubble->setSprite(newColor);
+			activeBubble->setPosition(SCREEN_WIDTH / 2, SCREEN_HEIGHT - 25);
+
+			//la prochaine bulle devient une nouvelle bulle
+			randomColor = getRandomValue(3);
+			nextBubble = new Bubble(SCREEN_WIDTH / 2 + 47, SCREEN_HEIGHT - 25);
+			nextBubble->setSprite(randomColor);
+
 		}
 
 		//Mettre à jour l'écran
@@ -310,14 +308,26 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, bool &scree
 		canon->update(screen);
 		activeBubble->update(screen);
 		nextBubble->update(screen);
+
+		//Vérifier les conditions de défaite
+		hasLost = bubbleGrid->checkLastLine();
+		if (hasLost)
+		{
+			gameIsActive = false;
+		}
 		
 	}
 
+	//Redessine les éléments du menu principal
+	updateScreen(screen, bg, bgPos);
+	updateScreen(screen, logo, logoPos);
+	updateScreen(screen, menu, menuPos);
+
 	//Libère les surfaces de la grille de jeu
-	bubbleGrid->freeSurfaces();
-	delete canon;
+	/*bubbleGrid->freeSurfaces();*/
+	/*delete canon;
 	delete activeBubble;
-	delete nextBubble;
+	delete nextBubble;*/
 
 }
 

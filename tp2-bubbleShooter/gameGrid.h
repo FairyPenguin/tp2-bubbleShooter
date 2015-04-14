@@ -43,5 +43,7 @@ public:
 	bool checkActiveBubbleCollision(Bubble* activeBubble);
 	bool manageCollision(Bubble* &activeBubble);
 	void stickBubbleInGrid(Bubble* &activeBubble);
+	bool checkLastLine();
+	void shiftGridLines(SDL_Surface *screen);
 	
 };

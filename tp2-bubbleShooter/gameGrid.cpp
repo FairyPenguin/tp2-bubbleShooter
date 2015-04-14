@@ -23,12 +23,14 @@ GameGrid::GameGrid(int bubbleDiameter)
 void GameGrid::insertLine(SDL_Surface *screen)
 {
 
-	int startingPattern[GRID_WIDTH] = {0, 2, 1, 2, 0, 0, 1, 0};
+	/*int startingPattern[GRID_WIDTH] = {0, 2, 1, 2, 0, 0, 1, 0};*/
 
 	for (int i = 0; i < GRID_WIDTH; i++)		//pour chaque case de la première ligne (index 0)
 	{
 
-		bubble[0][i].setSprite(startingPattern[i]);
+		/*bubble[0][i].setSprite(startingPattern[i]);*/
+		int newColor = getRandomValue(3);
+		bubble[0][i].setSprite(newColor);
 		bubble[0][i].update(screen);
 
 	}
@@ -42,17 +44,17 @@ void GameGrid::shiftGridLines(SDL_Surface *screen)
 
 	//Décale les bulles de la première ligne à l'avant-dernière ligne.
 
-	for (int i = (GRID_HEIGHT - 2); i > 0 ; i--)		//pour chaque ligne de la grille
+	for (int i = (GRID_HEIGHT - 1); i > 0; i--)		//pour chaque ligne de la grille
 	{
 		for (int j = 0; j < GRID_WIDTH; j++)		//pour chaque colonne de la grille
 		{
-			bool status = bubble[i][j].getInGameStatus();
+			bool status = bubble[i - 1][j].getInGameStatus();
 
 			//Si la bulle est affichée, la descendre d'un étage
 			if (status)
 			{
-				int newColor = bubble[i][j].getColor();
-				bubble[i - 1][j].setSprite(newColor);
+				int newColor = bubble[i-1][j].getColor();
+				bubble[i][j].setSprite(newColor);
 
 			}
 
@@ -62,12 +64,6 @@ void GameGrid::shiftGridLines(SDL_Surface *screen)
 				bubble[i - 1][j].setInGameStatus(false);
 			}
 		}
-	}
-
-	//Retirer toutes les images des bulles existantes dans l'avant-dernière ligne.
-	for (int i = 0; i < GRID_WIDTH; i++)
-	{
-		bubble[8][i].setInGameStatus(false);
 	}
 
 	//Insère une ligne dans la première ligne

@@ -32,7 +32,7 @@ const int GRID_HEIGHT = 10;
 const int GRID_WIDTH = 8;
 const int REFRESH_TIME = 600;
 const int TIME_IN_MILLISECONDS_BEFORE_NEXT_UPDATE = 16;
-const int TIME_BETWEEN_INSERT = 5000;
+const int TIME_BETWEEN_INSERT = 15000;
 
 /* Prototype des fonctions
 =========================== */
@@ -207,6 +207,9 @@ void playGame(SDL_Surface *screen, SDL_Surface *bg, SDL_Rect &bgPos, SDL_Surface
 	gameIsActive = true;
 	hasLost = false;
 	bubbleHasCollided = false;
+
+	//Initialisation du générateur de nombres aléatoires
+	srand(time(NULL));
 
 	//Redessiner l'écran avec le background pour faire disparaître le menu
 	updateScreen(screen, bg, bgPos);

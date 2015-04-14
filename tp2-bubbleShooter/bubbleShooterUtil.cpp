@@ -104,13 +104,13 @@ namespace BubbleShooterUtil
 	============================================ */
 	int getRandomValue(int maxValue)
 	{
-		
-		srand(time(NULL));	//initialise le générateur de nombres aléatoires
-		
 		int random;
-
-		random = (rand() % maxValue);		//génère un nombre aléatoire
-
+		
+		for (int i = 0; i < 3; i++)
+		{
+			random = (rand() % maxValue);		//génère un nombre aléatoire
+		}
+		
 		return random;
 	}
 

@@ -45,5 +45,10 @@ public:
 	void stickBubbleInGrid(Bubble* &activeBubble);
 	bool checkLastLine();
 	void shiftGridLines(SDL_Surface *screen);
+	void manageAdjacentBubbles(Bubble *activeBubble);
+	void resetGridCheck();
+	void checkAdjacentBubbles(Bubble checkedBubble);
+	int countAdjacentBubbles();
+	void popBubbles();
 	
 };

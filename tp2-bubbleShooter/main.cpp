@@ -4,14 +4,14 @@ Programme: Bubble Shooter
 Fichier: main.cpp
 Auteur : Amélie Frappier et Marc-Antoine Larose
 Date création : 23/03/2015
-Date modification: 12/04/2015
+Date modification: 14/04/2015
 Description :  Dans le jeu Bubble Shooter, il faut faire des combinaisons de 3 bulles de même couleur ou plus pour les faire disparaître de la grille de jeu.
 En usant des flèches, le joueur fait tourner un canon dans la direction voulue, et en appuyant sur Espace, il tire une bulle dans l'aire de jeu. En touchant une bulle, 
 le jeu vérifie s'il y a 3 couleurs identiques ou plus autour de lui: si c'est le cas, les bulles disparaissent. Si les bulles descendent trop bas, le jeu se termine.*/
 
 /* TODO: améliorations à apporter au programme
 ================================================= */
-//Insérer algorithme de destruction et de check des bulles adjacentes.
+//popBubbles fait crasher le jeu à certaines moments (out of bounds ne fonctionne pas bien??)
 //Les destructeurs ne fonctionnenent pas correctement
 
 /* Directives au pré-processeur

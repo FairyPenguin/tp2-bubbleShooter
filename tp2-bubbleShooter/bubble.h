@@ -35,6 +35,10 @@ private:
 	int velocityX;						//velocité en X
 	int velocityY;						//velocité en Y
 	bool inGameStatus;					//identifie si la bulle est en-jeu (vrai) ou si elle me l'est pas (faux)
+
+	bool isChecked;						//valide si la bulle a été déjà vérifiée durant checkAdjacentBubbles()
+	bool isAdjacent;					//vérifie si une bulle est adjacente à une autre de même couleur
+
 	
 
 public:
@@ -63,6 +67,8 @@ public:
 	void setPosition(int x, int y);
 	void setPosition(SDL_Rect otherPosition);
 	void setInGameStatus(bool status);
+	void setIsChecked(bool checked);
+	void setIsAdjacent(bool adjacent);
 	
 	//Fonctions utilitaires
 	void move();
@@ -80,6 +86,8 @@ public:
 	int getVelocityX();
 	int getVelocityY();
 	bool getInGameStatus();
+	bool getIsChecked();
+	bool getIsAdjacent();
 	Circle getHitbox();
 
 };

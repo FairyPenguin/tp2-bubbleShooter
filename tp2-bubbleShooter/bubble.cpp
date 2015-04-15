@@ -237,6 +237,30 @@ void Bubble::setInGameStatus(bool status)
 	inGameStatus = status;
 }
 
+/* Assigne si une balle a été préalablement vérifiée par la grille ou non
+=========================================================================== */
+void Bubble::setIsChecked(bool checked)
+{
+	isChecked = checked;
+}
+
+/* Assigne si une balle est effectivement adjacente à une autre
+================================================================= */
+void Bubble::setIsAdjacent(bool adjacent) 
+{
+	isAdjacent = adjacent;
+}
+
+bool Bubble::getIsChecked()
+{
+	return isChecked;
+}
+
+bool Bubble::getIsAdjacent()
+{
+	return isAdjacent;
+}
+
 /* Initialise le charset des bulles dans le tableau sprite[]
 ============================================================== */
 void Bubble::initCharset() 

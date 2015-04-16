@@ -12,7 +12,9 @@ Description :  Classe GameGrid du jeu Bubble Shooter */
 #include "bubbleShooterUtil.h"
 #include "../SDL/SDL.h"
 #include "bubble.h"
+#include <vector>
 
+using namespace std;
 using namespace BubbleShooterUtil;
 
 /* Définition de la classe
@@ -23,7 +25,7 @@ private:
 
 	static const int GRID_HEIGHT = 10;				//hauteur de la grille de jeu
 	static const int GRID_WIDTH = 8;				//largueur de la grille de jeu
-	static const int REQUIRED_BUBBLES_TO_POP = 1;	//nombre de bulles adjacentes nécéssaires avant que ça "pop"
+	static const int REQUIRED_BUBBLES_TO_POP = 4;	//nombre de bulles adjacentes nécéssaires avant que ça "pop"
 													//(3 + 1 car cette constante inclut la bulle active)
 
 	SDL_Rect position;							//coordonnées en pixels d'une case dans la grille
@@ -32,6 +34,12 @@ private:
 
 
 public:
+
+	struct PositionStructure
+	{
+		int x;
+		int y;
+	};
 
 	//Constructeur et destructeur
 	GameGrid(int bubbleDiameter);
@@ -52,5 +60,9 @@ public:
 	void checkAdjacentBubbles(Bubble checkedBubble);
 	int countAdjacentBubbles();
 	void popBubbles();
+	void countAdjacent(vector<PositionStructure> &toPop, int x, int y, int myColor);
+	bool contains(vector<PositionStructure> toPop, PositionStructure position);
+	void addedValue(int x, int y, int myColor);
+	void pop(PositionStructure position);
 	
 };

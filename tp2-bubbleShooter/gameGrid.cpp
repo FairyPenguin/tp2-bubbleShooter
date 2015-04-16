@@ -325,19 +325,14 @@ void GameGrid::addedValue(int x, int y, int myColor)
 {
 	vector<PositionStructure> toPop;
 	countAdjacent(toPop, x, y, myColor);
-
+		
 	if (toPop.size() >= REQUIRED_BUBBLES_TO_POP)
 	{
 		for (PositionStructure position : toPop)
 		{
-			pop(position);
+			bubble[position.x][position.y].setInGameStatus(false);
 		}
 	}
-}
-
-void GameGrid::pop(PositionStructure maPosition)
-{
-	bubble[maPosition.x][maPosition.y].setInGameStatus(false);
 }
 
 ///* Vérifie le nombre de bulles adjacentes de même couleur 

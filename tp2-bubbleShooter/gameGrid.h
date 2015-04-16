@@ -17,6 +17,17 @@ Description :  Classe GameGrid du jeu Bubble Shooter */
 using namespace std;
 using namespace BubbleShooterUtil;
 
+
+
+struct PositionStructure
+{
+	int x;
+	int y;
+};
+
+#ifndef GAMEGRID_H
+#define GAMEGRID_H
+
 /* Définition de la classe
 ================================= */
 class GameGrid
@@ -35,34 +46,26 @@ private:
 
 public:
 
-	struct PositionStructure
-	{
-		int x;
-		int y;
-	};
-
 	//Constructeur et destructeur
 	GameGrid(int bubbleDiameter);
 	void freeSurfaces();
 
 	//Fonctions utilitaires
-	void initPosition(int bubbleDiameter, int line, int column);
-	void insertLine(SDL_Surface *screen);
-	void update(SDL_Surface *screen);
-	bool checkBubbleCollisions(Bubble* activeBubble);
-	bool checkActiveBubbleCollision(Bubble* activeBubble);
-	bool manageCollision(Bubble* &activeBubble);
-	void stickBubbleInGrid(Bubble* &activeBubble);
-	bool checkLastLine();
-	void shiftGridLines(SDL_Surface *screen);
-	void manageAdjacentBubbles(Bubble *activeBubble);
-	void resetGridCheck();
-	void checkAdjacentBubbles(Bubble checkedBubble);
-	int countAdjacentBubbles();
-	void popBubbles();
+	void initPosition(int bubbleDiameter, int line, int column);		//initialise les positions des bulles de la grille
+	void insertLine(SDL_Surface *screen);								//insère une ligne dans la grille
+	void update(SDL_Surface *screen);									//met à jour les bulles de la gruille
+	bool checkBubbleCollisions(Bubble* activeBubble);					//vérifie les collisions entre la bulle active et les bulles de la grille
+	bool checkActiveBubbleCollision(Bubble* activeBubble);				//appelle checkActiveBubbleCollision() ainsi que les collisions sur les murs
+	bool manageCollision(Bubble* &activeBubble);						//gère les collisions de la bulle active
+	void stickBubbleInGrid(Bubble* &activeBubble);						//met la bulle dans la grille et vérifie l'adjacence
+	bool checkLastLine();												//vérifie s'il y a des bulles en jeu dans la dernière ligne
+	void shiftGridLines(SDL_Surface *screen);							//décale les bulles 1 ligne plus bas dans la grille avant d'en insérer une nouvelle
+	void resetGridCheck();												//remet la grille à zéro avant de vérifier l'adjacence
+
 	void countAdjacent(vector<PositionStructure> &toPop, int x, int y, int myColor);
 	bool contains(vector<PositionStructure> toPop, PositionStructure position);
 	void addedValue(int x, int y, int myColor);
-	void pop(PositionStructure position);
 	
 };
+
+#endif

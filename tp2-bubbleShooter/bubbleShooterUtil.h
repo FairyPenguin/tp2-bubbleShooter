@@ -32,5 +32,6 @@ namespace BubbleShooterUtil
 	void updateScreenWithSpriteSheet(SDL_Surface *screen, SDL_Surface *picture, SDL_Rect &currentSprite, SDL_Rect &position);
 	int getRandomValue(int maxValue);
 	double calculateDistance(int x1, int x2, int y1, int y2);
+	void setOutOfBoundsValues(int &maxLineNbr, int &minLineMbr, int &maxColumnNbr, int &minColumnNbr);
 
 }

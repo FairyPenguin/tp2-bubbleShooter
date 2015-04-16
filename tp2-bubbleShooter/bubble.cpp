@@ -6,6 +6,8 @@
 Bubble::Bubble()	//constructeur par défaut
 {
 	inGameStatus = false;
+	isChecked = false;
+	isAdjacent = false;
 	velocityX = 0;
 	velocityY = 0;
 	position.w = 47;
@@ -15,6 +17,8 @@ Bubble::Bubble()	//constructeur par défaut
 Bubble::Bubble(int posX, int posY)	//constructeur assignant une position donnée à la bulle
 {
 	inGameStatus = false;
+	isChecked = false;
+	isAdjacent = false;
 	position.x = posX;
 	position.y = posY;
 	velocityX = 0;
@@ -27,7 +31,7 @@ Bubble::Bubble(int posX, int posY)	//constructeur assignant une position donnée 
 ====================================== */
 Bubble::~Bubble()
 {
-	//Libérer la surface de la bulle seulement si elle n'Eest pas déjà en jeu
+	//Libérer la surface de la bulle seulement si elle n'est pas déjà en jeu
 	if (inGameStatus)
 	{
 		SDL_FreeSurface(spriteSheet);

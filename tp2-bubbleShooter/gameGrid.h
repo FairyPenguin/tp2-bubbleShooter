@@ -21,8 +21,10 @@ class GameGrid
 {
 private:
 
-	static const int GRID_HEIGHT = 10;			//hauteur de la grille de jeu
-	static const int GRID_WIDTH = 8;			//largueur de la grille de jeu
+	static const int GRID_HEIGHT = 10;				//hauteur de la grille de jeu
+	static const int GRID_WIDTH = 8;				//largueur de la grille de jeu
+	static const int REQUIRED_BUBBLES_TO_POP = 1;	//nombre de bulles adjacentes nécéssaires avant que ça "pop"
+													//(3 + 1 car cette constante inclut la bulle active)
 
 	SDL_Rect position;							//coordonnées en pixels d'une case dans la grille
 	Bubble bubble[GRID_HEIGHT][GRID_WIDTH];		//bulle contenue dans une case donnée de la grille

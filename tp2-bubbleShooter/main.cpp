@@ -11,8 +11,9 @@ le jeu vérifie s'il y a 3 couleurs identiques ou plus autour de lui: si c'est le
 
 /* TODO: améliorations à apporter au programme
 ================================================= */
-//popBubbles fait crasher le jeu à certaines moments (out of bounds ne fonctionne pas bien??)
-//Les destructeurs ne fonctionnenent pas correctement
+//Si REQUIRED_BUBBLES_TO_POP >= 1, ça ne fonctionne pas et fait crasher le jeu.
+//Les lignes de bulles verticales ne se défont pas dans les colonnes 1 et 8.
+//Les destructeurs ne fonctionnenent pas correctement, pourraient être améliorés.
 
 /* Directives au pré-processeur
 ================================= */

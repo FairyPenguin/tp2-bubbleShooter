@@ -76,7 +76,11 @@ void GameGrid::update(SDL_Surface *screen)
 	{
 		for (int j = 0; j < GRID_WIDTH; j++)		//pour chaque colonne de la grille
 		{
-			bubble[i][j].update(screen);
+			if (bubble[i][j].getInGameStatus())
+			{
+				bubble[i][j].update(screen);
+			}
+			
 		}
 	}
 }
@@ -85,7 +89,7 @@ void GameGrid::update(SDL_Surface *screen)
 ================================================ */
 bool GameGrid::manageCollision(Bubble* &activeBubble)
 {
-	int nbOfAdjBubbles;		//nombre de bulles adjacentes trouvées par la grille
+	int nbOfAdjBubbles = 0;		//nombre de bulles adjacentes trouvées par la grille
 
 	if (checkActiveBubbleCollision(activeBubble))	//s'il y a effectivement collision
 	{	
@@ -101,9 +105,8 @@ bool GameGrid::manageCollision(Bubble* &activeBubble)
 		//Retourne le nombre de bulles adjacentes
 		nbOfAdjBubbles = countAdjacentBubbles();
 
-		//********** TEST *************
 		//"Pop" les bulles adjacentes
-		if (nbOfAdjBubbles > 0)
+		if (nbOfAdjBubbles > REQUIRED_BUBBLES_TO_POP)	//si required_bubbles >= 1, ça plante...
 		{
 			popBubbles();
 		}
@@ -228,6 +231,7 @@ void GameGrid::stickBubbleInGrid(Bubble* &activeBubble)
 
 	//Met la bulle active placée dans la grille comme étant "vérifiée" afin de faire le check des bulles adjacentes
 	bubble[shortestDistanceLine][shortestDistanceColumn].setIsChecked(true);
+	bubble[shortestDistanceLine][shortestDistanceColumn].setIsAdjacent(true);
 
 	//Vérifie s'il y a bien des bulles adjacentes
 	checkAdjacentBubbles(bubble[shortestDistanceLine][shortestDistanceColumn]);
@@ -300,22 +304,22 @@ void GameGrid::checkAdjacentBubbles(Bubble bubbleToCheck)
 	columnCheckMaxValue = columnOfCheckedBubble + 1;
 
 	//Ajuste les limites du check pour s'assurer que l'on ne tombe pas "out of bounds"
-	if (lineOfCheckedBubble == 0)
+	if (lineOfCheckedBubble <= 0)
 	{
-		lineCheckMinValue++;
+		lineCheckMinValue = 1;
 	}
-	else if (lineOfCheckedBubble == GRID_HEIGHT - 1)
+	else if (lineOfCheckedBubble >= GRID_HEIGHT - 1)
 	{
-		lineCheckMaxValue--;
+		lineCheckMaxValue = GRID_HEIGHT - 2;
 	}
 
-	if (columnOfCheckedBubble == 0)
+	if (columnOfCheckedBubble <= 0)
 	{
-		columnCheckMinValue++;
+		columnCheckMinValue = 1;
 	}
-	else if (lineOfCheckedBubble == GRID_HEIGHT - 1)
+	else if (columnOfCheckedBubble >= GRID_WIDTH - 1)
 	{
-		columnCheckMaxValue--;
+		columnCheckMaxValue = GRID_WIDTH - 2;
 	}
 
 	//Vérifie la couleur des bulles se trouvant autour de la bulle vérifiée
@@ -323,14 +327,19 @@ void GameGrid::checkAdjacentBubbles(Bubble bubbleToCheck)
 	{
 		for (int j = columnCheckMinValue; j <= columnCheckMaxValue; j++)
 		{
-				
-			//Si la bulle n'a pas été vérifiée auparavant et que la bulle adjacente est de la même couleur
-			//appeler de façon récursive la fonction pour vérifier les paramètres de la bulle adjacente à celle-ci
-			if (bubble[i][j].getIsChecked() == false && bubble[i][j].getColor() == colorToCompare)
+			//Ne vérifier la bulle que si elle est bien en jeu
+			if (bubble[i][j].getInGameStatus())
 			{
-				bubble[i][j].setIsAdjacent(true);
-				bubble[i][j].setIsChecked(true);	
-				checkAdjacentBubbles(bubble[i][j]);
+				//Si la bulle n'a pas été vérifiée auparavant et que la bulle adjacente est de la même couleur
+				//appeler de façon récursive la fonction pour vérifier les paramètres de la bulle adjacente à celle-ci
+				if (bubble[i][j].getIsChecked() == false && bubble[i][j].getColor() == colorToCompare)
+				{
+					bubble[i][j].setIsAdjacent(true);
+					bubble[i][j].setIsChecked(true);
+					/******* SECTION À PROBLÈME!************/
+					/*****Passer le débogueur dessus de façon détaillée*****/
+					checkAdjacentBubbles(bubble[i][j]);
+				}
 			}
 
 			bubble[i][j].setIsChecked(true);
